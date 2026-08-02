@@ -493,7 +493,7 @@ git commit -m "feat: add LiveClock component with tests"
 **Files:**
 - Create: `components/hero-section.tsx`, `components/hero-section.test.tsx`
 
-> Uses `LiquidEther` from `@/components/ui/liquid-ether` (adjust the import if Task 2 Step 3 found a different path/export name).
+> Uses `LiquidEther` from `@/components/LiquidEther` (confirmed in Task 2: the `shadcn add` CLI generated `components/LiquidEther.jsx` with a **default** export, not `@/components/ui/liquid-ether` with a named export as originally assumed).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -503,8 +503,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { HeroSection } from './hero-section'
 
-vi.mock('@/components/ui/liquid-ether', () => ({
-  LiquidEther: () => null,
+vi.mock('@/components/LiquidEther', () => ({
+  default: () => null,
 }))
 
 describe('HeroSection', () => {
@@ -541,7 +541,7 @@ Expected: FAIL — `Cannot find module './hero-section'` (or similar).
 
 `components/hero-section.tsx`:
 ```tsx
-import { LiquidEther } from '@/components/ui/liquid-ether'
+import LiquidEther from '@/components/LiquidEther'
 import { LiveClock } from '@/components/live-clock'
 
 export function HeroSection() {
@@ -694,4 +694,4 @@ git commit -m "feat: render the hero section on the homepage"
 ## Self-review notes
 
 - Spec coverage: scaffold (Task 1), shadcn + LiquidEther install (Task 2), test tooling (Task 3), fonts (Task 4), colors (Task 5), live clock (Tasks 6–7), hero composition + LiquidEther full-bleed background (Task 8), homepage wiring + responsive/visual check (Task 9). All spec decisions are covered.
-- The one open variable is the exact file path/export name the `shadcn add` command produces for LiquidEther — flagged explicitly in Task 2 Step 3 and Task 8's header note, with a concrete default assumption (`@/components/ui/liquid-ether`, export `LiquidEther`) to adjust only if the CLI output differs.
+- The one open variable was the exact file path/export name the `shadcn add` command produces for LiquidEther — resolved during Task 2 execution: the CLI generated `components/LiquidEther.jsx` (plain JSX, not under `components/ui/`) with a **default** export, not the assumed `@/components/ui/liquid-ether` named export. Tasks 8/9 have been updated to import it as `import LiquidEther from '@/components/LiquidEther'`. The generated file also lacked a `'use client'` directive despite using hooks and mounting a WebGL canvas — added as a follow-up fix in Task 2 so Task 8's build doesn't break.
