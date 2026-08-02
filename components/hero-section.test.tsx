@@ -1,10 +1,16 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, cleanup } from '@testing-library/react'
 import { HeroSection } from './hero-section'
 
-vi.mock('@/components/LiquidEther', () => ({
-  default: () => null,
+const { liquidEtherMock } = vi.hoisted(() => ({
+  liquidEtherMock: vi.fn<(props: unknown) => null>(() => null),
 }))
+
+vi.mock('@/components/LiquidEther', () => ({
+  default: (props: unknown) => liquidEtherMock(props),
+}))
+
+afterEach(cleanup)
 
 describe('HeroSection', () => {
   it('renders the headline, subtext, and both CTAs', () => {
@@ -24,5 +30,28 @@ describe('HeroSection', () => {
     expect(
       screen.getByRole('link', { name: 'Ver serviços' })
     ).toBeInTheDocument()
+  })
+
+  it('renders the logo mark', () => {
+    render(<HeroSection />)
+
+    expect(screen.getByText('N')).toBeInTheDocument()
+  })
+
+  it('renders the bottom info row', () => {
+    render(<HeroSection />)
+
+    expect(screen.getByText('ATUANDO GLOBALMENTE')).toBeInTheDocument()
+    expect(
+      screen.getByText('SEM ESCRITÓRIO, POR OPÇÃO')
+    ).toBeInTheDocument()
+    expect(screen.getByText('AGENDA ABERTA, 2026')).toBeInTheDocument()
+    expect(screen.getByText('NO SEU FUSO-HORÁRIO')).toBeInTheDocument()
+  })
+
+  it('mounts the LiquidEther background', () => {
+    render(<HeroSection />)
+
+    expect(liquidEtherMock).toHaveBeenCalled()
   })
 })
