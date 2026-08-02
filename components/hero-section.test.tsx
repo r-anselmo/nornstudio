@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import { HeroSection } from './hero-section'
 
 const { liquidEtherMock } = vi.hoisted(() => ({
@@ -9,8 +9,6 @@ const { liquidEtherMock } = vi.hoisted(() => ({
 vi.mock('@/components/LiquidEther', () => ({
   default: (props: unknown) => liquidEtherMock(props),
 }))
-
-afterEach(cleanup)
 
 describe('HeroSection', () => {
   it('renders the headline, subtext, and both CTAs', () => {
