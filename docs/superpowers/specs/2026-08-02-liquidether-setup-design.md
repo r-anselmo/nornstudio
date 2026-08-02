@@ -28,14 +28,29 @@ highlighted lines, live local-time indicator, CTAs, and a bottom info row.
 - Mobile-first layout (per reference image), scaling up at `md`/`lg` as the
   same centered vertical composition, just larger — no separate desktop
   redesign
-- Colors: near-black background (`#141414`), lime accent `#C6F432` (matches
-  the `LiquidEther` `colors` prop), white headline text, muted gray subtext
-- Typography: temporary heavy grotesk from `next/font/google` (Archivo Black
-  or Inter, weight 900) behind a single `--font-heading` token/CSS variable,
-  so the real Norn brand font (to be supplied later as files) can replace it
-  in one place
-- Logo: placeholder lime rounded-square "N" mark built in CSS/text, swappable
-  for a real logo asset later
+- Colors, from the Norn brand book: Lime `#C6F432` (accent, matches the
+  `LiquidEther` `colors` prop), Carbon Black `#1D1E18` (hero background),
+  Platinum Gray `#C7C7C5` (muted subtext), Alabaster White `#FAFBFA`
+  (headline/primary text) — wired as Tailwind theme tokens
+  (`lime`/`carbon-black`/`platinum-gray`/`alabaster`), not raw hex in markup
+- Typography, from the brand book, both self-hosted via `next/font/local`
+  (files already supplied locally):
+  - Primary/headings: **Cabinet Grotesk** — Black for the headline lines,
+    Medium for the subheadline-weight text — `.otf` files at
+    `~/Downloads/cabinet-grotesk/`, copied into `app/fonts/cabinet-grotesk/`.
+    Exposed as CSS var `--font-heading`
+  - Secondary/body & UI: **General Sans** — Regular for body copy, Medium
+    for UI labels/buttons (tracking 2%, per brand book) — `.woff2` files at
+    `~/Downloads/GeneralSans_Complete/Fonts/WEB/fonts/`, copied into
+    `app/fonts/general-sans/`. Exposed as CSS var `--font-body`
+  - Sizing follows the brand book type hierarchy (mobile-first: start below
+    the desktop Headline 1/2 spec of 56/60pt and 40/48pt, tracking 2%, and
+    scale up at `md`/`lg`; subtext at Body Regular 16pt/24; CTAs/labels at
+    UI Label 14pt/20, tracking 2%)
+- Logo: brand book shows a dedicated "N" mark (icon-only variant, min size
+  110×48px) but no vector file was supplied — still a placeholder rounded
+  lime square approximating the mark's shape/colors, swappable for the real
+  SVG once provided
 - Live clock: client component (`components/live-clock.tsx`), updates every
   second via `useEffect`/`setInterval`, renders the visitor's local time,
   renders nothing until mounted to avoid SSR/CSR hydration mismatch
@@ -63,20 +78,24 @@ highlighted lines, live local-time indicator, CTAs, and a bottom info row.
    ESLint, npm, default `@/*` import alias
 3. `npx shadcn@latest init` to generate `components.json` and theme tokens
 4. `npx shadcn@latest add @react-bits/LiquidEther-JS-CSS`
-5. Add heading font via `next/font/google`, exposed as a `--font-heading` CSS
-   variable
-6. Build `components/live-clock.tsx`
-7. Build `components/hero-section.tsx` (top bar, headline, subtext, CTAs,
+5. Copy the supplied font files into `app/fonts/cabinet-grotesk/` (`.otf`)
+   and `app/fonts/general-sans/` (`.woff2`); configure both via
+   `next/font/local` in `app/fonts.ts`, exposing `--font-heading` and
+   `--font-body` CSS variables applied on `<html>`/`<body>`
+6. Add the brand palette (Lime, Carbon Black, Platinum Gray, Alabaster) as
+   Tailwind theme tokens
+7. Build `components/live-clock.tsx`
+8. Build `components/hero-section.tsx` (top bar, headline, subtext, CTAs,
    bottom info row, `LiquidEther` background)
-8. Render `HeroSection` from `app/page.tsx`, replacing the default scaffold
+9. Render `HeroSection` from `app/page.tsx`, replacing the default scaffold
    content
-9. Commit
+10. Commit
 
 ## Out of scope
 
 - No additional pages, routes, or sections beyond the hero
 - No deployment configuration
 - No additional shadcn components beyond `LiquidEther`
-- No real logo asset or final brand font file (both are placeholders until
-  supplied)
+- No real logo SVG (brand book shows it, but no vector file was supplied) —
+  placeholder mark stays until provided
 - No CMS/content wiring — copy is hardcoded to match the reference
