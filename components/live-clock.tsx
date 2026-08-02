@@ -7,6 +7,8 @@ export function LiveClock() {
   const [time, setTime] = useState<string | null>(null)
 
   useEffect(() => {
+    // Deferred into timer callbacks (not called synchronously here) to satisfy the
+    // react-hooks/set-state-in-effect lint rule.
     const update = () => setTime(formatClockTime(new Date()))
     const timeoutId = setTimeout(update, 0)
     const intervalId = setInterval(update, 1000)
