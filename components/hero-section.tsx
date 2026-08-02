@@ -3,8 +3,8 @@ import { LiveClock } from '@/components/live-clock'
 
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-svh w-full flex-col overflow-hidden bg-carbon-black px-6 py-6 md:px-12 md:py-10">
-      <div className="pointer-events-none absolute inset-0 z-0">
+    <main className="relative flex min-h-svh w-full flex-col overflow-hidden bg-carbon-black px-6 py-6 md:px-12 md:py-10">
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
         <LiquidEther
           mouseForce={20}
           cursorSize={100}
@@ -76,6 +76,6 @@ export function HeroSection() {
           </div>
         </footer>
       </div>
-    </section>
+    </main>
   )
 }
