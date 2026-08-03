@@ -68,7 +68,10 @@ function MessageBody({ message }: { message: ChatMessage }) {
 
 export function ChatFlowSection() {
   return (
-    <section className="bg-carbon-black px-6 py-16 md:px-12 md:py-24">
+    <section
+      id="como-fazemos"
+      className="bg-carbon-black px-6 py-16 md:px-12 md:py-24"
+    >
       <div className="mx-auto flex max-w-5xl flex-col gap-6">
         <SectionEyebrow>{chatFlowEyebrow}</SectionEyebrow>
 
