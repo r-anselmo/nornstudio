@@ -5,22 +5,13 @@ import {
   servicesSubheading,
 } from '@/lib/services'
 import { SpotlightCard, SpotlightGroup } from '@/components/ui/spotlight-card'
+import { SectionEyebrow } from '@/components/ui/section-eyebrow'
 
 export function ServicesSection() {
   return (
     <section className="bg-carbon-black px-6 py-16 md:px-12 md:py-24">
       <div className="mx-auto flex max-w-5xl flex-col gap-6">
-        <span className="relative inline-flex w-fit items-center px-3 py-1 font-body text-xs font-medium tracking-[0.02em] text-lime">
-          <span
-            aria-hidden="true"
-            className="absolute inset-y-0 left-0 w-2 border-y border-l border-lime"
-          />
-          {servicesEyebrow}
-          <span
-            aria-hidden="true"
-            className="absolute inset-y-0 right-0 w-2 border-y border-r border-lime"
-          />
-        </span>
+        <SectionEyebrow>{servicesEyebrow}</SectionEyebrow>
 
         <h2 className="font-heading text-3xl font-black leading-tight text-alabaster md:text-4xl">
           {servicesHeading}
