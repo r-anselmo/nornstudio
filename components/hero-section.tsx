@@ -1,22 +1,11 @@
-import LiquidEther from '@/components/LiquidEther'
+import { LiquidEtherBackground } from '@/components/liquid-ether-background'
 import { LiveClock } from '@/components/live-clock'
 
 export function HeroSection() {
   return (
     <main className="relative flex min-h-svh w-full flex-col overflow-hidden bg-carbon-black px-6 py-6 md:px-12 md:py-10">
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-        <LiquidEther
-          mouseForce={20}
-          cursorSize={100}
-          isViscous
-          viscous={30}
-          colors={['#C6F432', '#C6F432', '#C6F432']}
-          autoDemo={false}
-          autoSpeed={0.5}
-          autoIntensity={2.2}
-          isBounce={false}
-          resolution={0.5}
-        />
+        <LiquidEtherBackground />
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col">
