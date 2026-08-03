@@ -8,6 +8,7 @@ import {
   Workflow,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { SpotlightCard, SpotlightGroup } from '@/components/ui/spotlight-card'
 
 type Skill = {
   label: string
@@ -33,8 +34,8 @@ export function WhatWeDoSection() {
           O que estamos fazendo
         </span>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 md:col-span-2">
+        <SpotlightGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 md:col-span-2">
             <div className="flex items-start justify-between">
               <Quote className="h-6 w-6 text-lime" aria-hidden="true" />
               <span className="font-body text-xs text-platinum-gray">
@@ -52,9 +53,9 @@ export function WhatWeDoSection() {
             <p className="font-body text-xs font-medium tracking-[0.02em] text-platinum-gray">
               NORNGROWTHDESIGN · SINCE 2026
             </p>
-          </div>
+          </SpotlightCard>
 
-          <div className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6">
+          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6">
             <div className="flex justify-end">
               <span className="font-body text-xs text-platinum-gray">
                 Habilidades
@@ -76,9 +77,9 @@ export function WhatWeDoSection() {
                 </div>
               ))}
             </div>
-          </div>
+          </SpotlightCard>
 
-          <div className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6">
+          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6">
             <div className="flex justify-end">
               <span className="font-body text-xs text-platinum-gray">
                 Atualmente construindo em
@@ -108,8 +109,8 @@ export function WhatWeDoSection() {
               <rect x="18" y="3" width="5" height="13" rx="1" />
               <rect x="27" y="0" width="5" height="16" rx="1" />
             </svg>
-          </div>
-        </div>
+          </SpotlightCard>
+        </SpotlightGroup>
       </div>
     </section>
   )

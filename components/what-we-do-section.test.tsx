@@ -3,6 +3,13 @@ import { render, screen } from '@testing-library/react'
 import { WhatWeDoSection } from './what-we-do-section'
 
 describe('WhatWeDoSection', () => {
+  it('gives all three cards the spotlight treatment', () => {
+    const { container } = render(<WhatWeDoSection />)
+
+    expect(screen.getByTestId('spotlight-group')).toBeInTheDocument()
+    expect(container.querySelectorAll('.spotlight-card')).toHaveLength(3)
+  })
+
   it('renders the eyebrow tag', () => {
     render(<WhatWeDoSection />)
 

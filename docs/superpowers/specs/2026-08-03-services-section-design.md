@@ -62,6 +62,19 @@ Auto mode is suppressed under `prefers-reduced-motion`. The pointer-driven path
 is not: that one is direct manipulation, like a hover state, and suppressing it
 would remove feedback rather than remove motion.
 
+**Shared with `WhatWeDoSection`**
+
+The spotlight was later applied to the three cards in `WhatWeDoSection` as well,
+which is why `SpotlightGroup` / `SpotlightCard` live under `components/ui/`
+rather than beside this section.
+
+Each section owns its own group, and that is deliberate: a group's light is one
+position in *its* coordinate space, so a single group spanning both sections
+would put the light in the gap between them for most of the page. Two groups
+also means two drivers, but each auto loop is parked by its own
+`IntersectionObserver` when its section is off screen, and the two sections are
+far enough apart that only one runs at a time.
+
 **Card-local coordinates, not `background-attachment: fixed`**
 
 Sharing one viewport coordinate space via `background-attachment: fixed` is the
