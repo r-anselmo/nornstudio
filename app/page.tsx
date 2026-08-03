@@ -1,3 +1,4 @@
+import { ChatFlowSection } from '@/components/chat-flow-section'
 import { HeroSection } from '@/components/hero-section'
 import { WhatWeDoSection } from '@/components/what-we-do-section'
 
@@ -6,6 +7,7 @@ export default function Home() {
     <>
       <HeroSection />
       <WhatWeDoSection />
+      <ChatFlowSection />
     </>
   )
 }
