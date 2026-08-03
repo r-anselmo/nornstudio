@@ -33,7 +33,7 @@ export function WhatWeDoSection() {
           O que estamos fazendo
         </span>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 md:col-span-2">
             <div className="flex items-start justify-between">
               <Quote className="h-6 w-6 text-lime" aria-hidden="true" />
