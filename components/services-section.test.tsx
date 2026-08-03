@@ -38,6 +38,12 @@ describe('ServicesSection', () => {
     })
   })
 
+  it('answers the hero link that points at #servicos', () => {
+    const { container } = render(<ServicesSection />)
+
+    expect(container.querySelector('section')).toHaveAttribute('id', 'servicos')
+  })
+
   it('wraps each service in a spotlight card', () => {
     const { container } = render(<ServicesSection />)
 

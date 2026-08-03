@@ -9,7 +9,12 @@ import { SectionEyebrow } from '@/components/ui/section-eyebrow'
 
 export function ServicesSection() {
   return (
-    <section className="bg-carbon-black px-6 py-16 md:px-12 md:py-24">
+    // The hero's "Ver serviços" link has always pointed at #servicos; this is
+    // the section it was waiting for.
+    <section
+      id="servicos"
+      className="bg-carbon-black px-6 py-16 md:px-12 md:py-24"
+    >
       <div className="mx-auto flex max-w-5xl flex-col gap-6">
         <SectionEyebrow>{servicesEyebrow}</SectionEyebrow>
 

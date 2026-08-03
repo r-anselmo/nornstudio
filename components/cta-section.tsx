@@ -35,7 +35,12 @@ function NornMark({ className }: { className?: string }) {
 
 export function CtaSection() {
   return (
-    <section className="relative overflow-hidden bg-lime px-6 py-16 md:px-12 md:py-24">
+    // The hero's "Iniciar Projeto" has always pointed at #contato; this is the
+    // section it was waiting for.
+    <section
+      id="contato"
+      className="relative overflow-hidden bg-lime px-6 py-16 md:px-12 md:py-24"
+    >
       <NornMark className="pointer-events-none absolute -bottom-16 -right-10 w-64 rotate-12 text-carbon-black/10 md:w-96" />
 
       <div className="relative mx-auto flex max-w-5xl flex-col items-start gap-6">

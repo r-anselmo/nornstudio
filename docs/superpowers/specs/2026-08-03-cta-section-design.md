@@ -60,6 +60,16 @@ change in an obvious place.
 **This is deliberately unfinished.** The button renders and looks live but does
 nothing. It must not be treated as a working CTA until `ctaHref` is set.
 
+**Two dangling anchors, fixed**
+
+The hero has always linked to `#contato` and `#servicos`, and neither target
+existed — both were silent no-ops in production. The sections they were waiting
+for are the ones being built here, so `CtaSection` takes `id="contato"` and
+`ServicesSection` takes `id="servicos"`, and both hero links now work.
+
+The CTA's own button keeps the `'#'` placeholder rather than `#contato`, which
+would link the section to itself.
+
 **Styling**
 - Section shell matches the others: `px-6 py-16 md:px-12 md:py-24` inside
   `mx-auto max-w-5xl`.

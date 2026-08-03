@@ -39,6 +39,12 @@ describe('CtaSection', () => {
     expect(screen.getByText(ctaEyebrow)).toHaveClass('text-carbon-black')
   })
 
+  it('answers the hero link that points at #contato', () => {
+    const { container } = render(<CtaSection />)
+
+    expect(container.querySelector('section')).toHaveAttribute('id', 'contato')
+  })
+
   it('hides the decorative mark from assistive technology', () => {
     const { container } = render(<CtaSection />)
 
