@@ -7,31 +7,7 @@ import {
   ctaSubheading,
 } from '@/lib/cta'
 import { SectionEyebrow } from '@/components/ui/section-eyebrow'
-
-/**
- * Oversized brand mark, bled off the corner as a watermark.
- *
- * Stands in for the real logo, which has never been supplied — the same
- * placeholder situation as the text "N" in the hero and the chat avatars.
- * Inline rather than a file in `public/`: with `output: "export"` and the
- * GitHub Pages `basePath`, static assets do not get the prefix automatically.
- */
-function NornMark({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 100 100"
-      aria-hidden="true"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="18"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M19 85V15l62 70V15" />
-    </svg>
-  )
-}
+import { NornMark } from '@/components/ui/norn-mark'
 
 export function CtaSection() {
   return (
@@ -41,7 +17,10 @@ export function CtaSection() {
       id="contato"
       className="relative overflow-hidden bg-lime px-6 py-16 md:px-12 md:py-24"
     >
-      <NornMark className="pointer-events-none absolute -bottom-16 -right-10 w-64 rotate-12 text-carbon-black/10 md:w-96" />
+      {/* Upright, never rotated: it is the logo, not a decorative squiggle.
+          Sized so enough of the glyph clears the button to still read as the
+          mark on a phone — smaller than this and it is just a smudge. */}
+      <NornMark className="pointer-events-none absolute -bottom-20 -right-16 w-80 text-carbon-black/10 sm:w-96 md:-bottom-24 md:-right-20 md:w-[30rem]" />
 
       <div className="relative mx-auto flex max-w-5xl flex-col items-start gap-6">
         <SectionEyebrow tone="carbon">{ctaEyebrow}</SectionEyebrow>

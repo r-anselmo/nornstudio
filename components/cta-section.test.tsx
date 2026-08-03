@@ -52,6 +52,16 @@ describe('CtaSection', () => {
     expect(mark).toHaveAttribute('aria-hidden', 'true')
   })
 
+  it('leaves the mark upright', () => {
+    const { container } = render(<CtaSection />)
+
+    // `className` on an SVG element is an SVGAnimatedString, not a string.
+    const classes = container.querySelector('svg')?.getAttribute('class') ?? ''
+
+    // A tilted logo reads as a broken image, not as decoration.
+    expect(classes).not.toMatch(/rotate|skew|-scale/)
+  })
+
   it('clips the mark to the section', () => {
     const { container } = render(<CtaSection />)
 

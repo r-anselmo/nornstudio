@@ -35,20 +35,33 @@ The two existing section tests were the safety net for the extraction — they
 assert the rendered eyebrow text and were left untouched, so a green run proves
 the refactor changed nothing observable.
 
-**The brand mark**
+**The brand mark (revised once the real logo arrived)**
 
-Still no logo file has ever been supplied, so this is the same placeholder
-situation as the text "N" in the hero and the chat avatars, just at display
-size. `NornMark` is an inline `<svg>`: a single stroked path (`M19 85V15l62
-70V15`) with `stroke-linecap: round`, matching the thick rounded strokes in the
-reference. Rotated and bled off the corner at `text-carbon-black/10`, with
-`overflow-hidden` on the section to clip it and `pointer-events-none` so it
-never intercepts the button.
+The first version was an approximation — a stroked `M19 85V15l62 70V15` path,
+tilted 12 degrees — built because no logo file had ever been supplied. It read
+as a crooked image rather than as branding.
+
+The real artwork is now in `components/ui/norn-mark.tsx`, with two changes from
+the source file. Its lime backdrop `<rect>` is dropped, since the mark sits on
+surfaces that already have their own colour. And the viewBox is tightened from
+the original 1080x1080 board to the glyph's own bounding box, computed as
+`176 189 724 725` — so the component's box *is* the mark, with no invisible
+16% padding to compensate for when positioning it against an edge.
+
+It is never rotated. A tilted logo reads as a broken image, and there is a test
+asserting no transform class reaches it.
 
 Inline rather than a file under `public/`: with `output: "export"` and the
 GitHub Pages `basePath`, static assets do not receive the prefix automatically,
-so an inline path avoids a class of broken-on-deploy bug entirely. Swap the path
-data when a real mark arrives.
+so an inline path avoids a class of broken-on-deploy bug entirely.
+
+Sizing was set from rendered screenshots at both widths. The first mobile size
+(`w-56`) left too little of the glyph clear of the button to be recognisable —
+it read as a smudge — so mobile runs at `w-80`.
+
+**Still placeholders elsewhere.** The hero header, the chat avatars and the
+footer all render the letter "N" as text. Now that a real mark exists they could
+use `NornMark` instead; that was out of scope for this change.
 
 **The button destination is a placeholder**
 
