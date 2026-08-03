@@ -1,180 +1,46 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, act } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import { ChatMessageRow } from './chat-message-row'
 
-type IntersectionCallback = (entries: Array<{ isIntersecting: boolean }>) => void
-
-let callbacks: IntersectionCallback[] = []
-const observeMock = vi.fn()
-const disconnectMock = vi.fn()
-
-class IntersectionObserverStub {
-  root = null
-  rootMargin = ''
-  thresholds: number[] = []
-  observe = observeMock
-  unobserve = vi.fn()
-  disconnect = disconnectMock
-  takeRecords = () => []
-
-  constructor(callback: IntersectionCallback) {
-    callbacks.push(callback)
-  }
-}
-
-function intersect() {
-  for (const callback of callbacks) {
-    callback([{ isIntersecting: true }])
-  }
-}
-
-function phaseOf() {
-  return screen.getByTestId('chat-row').getAttribute('data-phase')
-}
-
+// Reveal sequencing lives in the conversation cursor and is covered by
+// chat-conversation.test.tsx. These cover the row's own rendering.
 describe('ChatMessageRow', () => {
-  beforeEach(() => {
-    callbacks = []
-    observeMock.mockClear()
-    disconnectMock.mockClear()
-    vi.useFakeTimers()
-    vi.stubGlobal('IntersectionObserver', IntersectionObserverStub)
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }))
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
-    vi.unstubAllGlobals()
-  })
-
-  it('renders its children before any observer runs', () => {
+  it('renders its children with no conversation around it', () => {
     render(
-      <ChatMessageRow sender="client" delayMs={0}>
+      <ChatMessageRow index={0} sender="client">
         Queremos escalar
       </ChatMessageRow>
     )
 
-    expect(phaseOf()).toBe('initial')
+    expect(screen.getByTestId('chat-row')).toHaveAttribute(
+      'data-phase',
+      'initial'
+    )
     expect(screen.getByText('Queremos escalar')).toBeInTheDocument()
   })
 
-  it('hides the row and starts observing once armed', () => {
+  it('marks a norn message with the lime bubble edge and the N avatar', () => {
     render(
-      <ChatMessageRow sender="client" delayMs={0}>
-        Queremos escalar
-      </ChatMessageRow>
-    )
-
-    act(() => {
-      vi.advanceTimersByTime(0)
-    })
-
-    expect(phaseOf()).toBe('hidden')
-    expect(observeMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('reveals a client message as soon as it intersects', () => {
-    render(
-      <ChatMessageRow sender="client" delayMs={0}>
-        Queremos escalar
-      </ChatMessageRow>
-    )
-
-    act(() => {
-      vi.advanceTimersByTime(0)
-    })
-    act(() => {
-      intersect()
-    })
-
-    expect(phaseOf()).toBe('shown')
-    expect(screen.getByText('Queremos escalar')).toBeInTheDocument()
-  })
-
-  it('shows typing dots before revealing a norn message', () => {
-    render(
-      <ChatMessageRow sender="norn" delayMs={0}>
+      <ChatMessageRow index={0} sender="norn">
         Qual métrica te tira o sono hoje?
       </ChatMessageRow>
     )
 
-    act(() => {
-      vi.advanceTimersByTime(0)
-    })
-    act(() => {
-      intersect()
-    })
-
-    expect(phaseOf()).toBe('typing')
-
-    act(() => {
-      vi.advanceTimersByTime(700)
-    })
-
-    expect(phaseOf()).toBe('shown')
+    expect(screen.getByText('N')).toBeInTheDocument()
     expect(
-      screen.getByText('Qual métrica te tira o sono hoje?')
-    ).toBeInTheDocument()
+      screen.getByText('Qual métrica te tira o sono hoje?').parentElement
+        ?.className
+    ).toContain('border-r-lime')
   })
 
-  it('stops observing after revealing', () => {
+  it('renders a footer alongside the bubble', () => {
     render(
-      <ChatMessageRow sender="client" delayMs={0}>
-        Queremos escalar
-      </ChatMessageRow>
-    )
-
-    act(() => {
-      vi.advanceTimersByTime(0)
-    })
-    act(() => {
-      intersect()
-    })
-
-    expect(disconnectMock).toHaveBeenCalled()
-  })
-
-  it('renders its footer alongside the bubble', () => {
-    render(
-      <ChatMessageRow sender="norn" delayMs={0} footer={<span>2 🔥</span>}>
+      <ChatMessageRow index={0} sender="norn" footer={<span>2 🔥</span>}>
         Protótipo pronto.
       </ChatMessageRow>
     )
 
     expect(screen.getByText('2 🔥')).toBeInTheDocument()
-  })
-
-  it('stays visible when the user prefers reduced motion', () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }))
-
-    render(
-      <ChatMessageRow sender="norn" delayMs={0}>
-        Qual métrica te tira o sono hoje?
-      </ChatMessageRow>
-    )
-
-    act(() => {
-      vi.advanceTimersByTime(0)
-    })
-
-    expect(phaseOf()).toBe('initial')
-    expect(observeMock).not.toHaveBeenCalled()
-  })
-
-  it('stays visible when IntersectionObserver is unavailable', () => {
-    vi.stubGlobal('IntersectionObserver', undefined)
-
-    render(
-      <ChatMessageRow sender="client" delayMs={0}>
-        Queremos escalar
-      </ChatMessageRow>
-    )
-
-    act(() => {
-      vi.advanceTimersByTime(0)
-    })
-
-    expect(phaseOf()).toBe('initial')
-    expect(screen.getByText('Queremos escalar')).toBeInTheDocument()
+    expect(screen.getByText('Protótipo pronto.')).toBeInTheDocument()
   })
 })

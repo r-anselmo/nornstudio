@@ -11,12 +11,19 @@ import {
   ChatMessageRow,
   ChatTypingDots,
 } from '@/components/chat-message-row'
+import { ChatConversation } from '@/components/chat-conversation'
 
-// Stagger within the phase, not across the whole conversation: every row observes
-// itself, so a global index would leave late messages invisible for a second
-// after they are already on screen.
-const STAGGER_STEP_MS = 80
-const MAX_STAGGER_STEPS = 3
+// The reveal cursor is conversation-wide, so rows are indexed across phases
+// rather than within them.
+const conversationSenders = chatPhases
+  .flatMap((phase) => phase.messages)
+  .map((message) => message.sender)
+
+function phaseOffset(phaseIndex: number) {
+  return chatPhases
+    .slice(0, phaseIndex)
+    .reduce((total, phase) => total + phase.messages.length, 0)
+}
 
 function Attachment({ attachment }: { attachment: ChatAttachment }) {
   const Icon = attachment.kind === 'pdf' ? FileText : FileCode2
@@ -29,13 +36,7 @@ function Attachment({ attachment }: { attachment: ChatAttachment }) {
   )
 }
 
-function MessageLine({
-  line,
-  emphasis,
-}: {
-  line: string
-  emphasis?: string
-}) {
+function MessageLine({ line, emphasis }: { line: string; emphasis?: string }) {
   if (!emphasis || !line.includes(emphasis)) {
     return <span className="block">{line}</span>
   }
@@ -87,54 +88,51 @@ export function ChatFlowSection() {
           {chatFlowSubheading}
         </p>
 
-        <div className="mx-auto mt-4 flex w-full max-w-2xl flex-col gap-8">
-          {chatPhases.map((phase) => (
-            <div key={phase.id} className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <span
-                  aria-hidden="true"
-                  className="h-px flex-1 bg-alabaster/15"
-                />
-                <h3 className="font-body text-xs font-medium tracking-[0.02em] text-lime">
-                  {phase.step} · {phase.label}
-                </h3>
-                <span
-                  aria-hidden="true"
-                  className="h-px flex-1 bg-alabaster/15"
-                />
+        <ChatConversation senders={conversationSenders}>
+          <div className="mx-auto mt-4 flex w-full max-w-2xl flex-col gap-8">
+            {chatPhases.map((phase, phaseIndex) => (
+              <div key={phase.id} className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="h-px flex-1 bg-alabaster/15"
+                  />
+                  <h3 className="font-body text-xs font-medium tracking-[0.02em] text-lime">
+                    {phase.step} · {phase.label}
+                  </h3>
+                  <span
+                    aria-hidden="true"
+                    className="h-px flex-1 bg-alabaster/15"
+                  />
+                </div>
+
+                {phase.messages.map((message, index) => (
+                  <ChatMessageRow
+                    key={message.id}
+                    index={phaseOffset(phaseIndex) + index}
+                    sender={message.sender}
+                    footer={
+                      message.reaction ? (
+                        <span className="w-fit rounded-full border border-alabaster/15 bg-alabaster/10 px-3 py-1 font-body text-xs text-alabaster">
+                          {message.reaction}
+                        </span>
+                      ) : undefined
+                    }
+                  >
+                    <MessageBody message={message} />
+                  </ChatMessageRow>
+                ))}
               </div>
+            ))}
 
-              {phase.messages.map((message, index) => (
-                <ChatMessageRow
-                  key={message.id}
-                  sender={message.sender}
-                  delayMs={
-                    Math.min(index, MAX_STAGGER_STEPS) * STAGGER_STEP_MS
-                  }
-                  footer={
-                    message.reaction ? (
-                      <span className="w-fit rounded-full border border-alabaster/15 bg-alabaster/10 px-3 py-1 font-body text-xs text-alabaster">
-                        {message.reaction}
-                      </span>
-                    ) : undefined
-                  }
-                >
-                  <MessageBody message={message} />
-                </ChatMessageRow>
-              ))}
+            <div data-testid="chat-flow-typing" className="flex items-end gap-3">
+              <ChatAvatar sender="client" />
+              <span className="rounded-2xl bg-alabaster/10 px-4 py-3.5">
+                <ChatTypingDots />
+              </span>
             </div>
-          ))}
-
-          <div
-            data-testid="chat-flow-typing"
-            className="flex items-end gap-3"
-          >
-            <ChatAvatar sender="client" />
-            <span className="rounded-2xl bg-alabaster/10 px-4 py-3.5">
-              <ChatTypingDots />
-            </span>
           </div>
-        </div>
+        </ChatConversation>
       </div>
     </section>
   )

@@ -53,34 +53,62 @@ the conversation as the visitor scrolls.
   "Functions cannot be passed directly to Client Components". The icon is
   resolved from `kind` inside the server component.
 
-**Reveal state machine (`ChatMessageRow`)**
+**Ordering: one conversation-wide cursor (revised after production feedback)**
 
-    'initial' → server render and first client render: bubble visible, no
-                animation classes. Hydration matches and the copy is always
-                in the static HTML.
-       ↓ useEffect → setTimeout(..., 0)
-       ├─ prefersReducedMotion() or no IntersectionObserver
-       │    → return before any setPhase; the row stays visible forever
-       └─ else → setPhase('hidden') [opacity-0], then attach the observer
-            ↓ on intersect (one-shot; observer disconnects)
-            ├─ client → 'shown'
-            └─ norn   → 'typing' (dots) --700ms--> 'shown'
+The first implementation gave every row its own observer and its own timers.
+That reads correctly in isolation but breaks the conversation: a Norn bubble
+pauses 700ms to "type" while the client message after it resolves in 0ms, so
+message 3 lands before message 2. It showed up on mobile first, where a short
+viewport pushes several rows across the trigger at once. It affected
+`descobrir` and `entregar`, both of which run `client → norn → client`.
 
-Three points are correctness requirements, not style:
-1. The reduced-motion / no-observer bail-out happens *before* any `setPhase`,
-   so those environments never schedule an update at all.
-2. The observer is constructed inside the same `setTimeout`, *after*
-   `setPhase('hidden')`. Attaching it in the effect body lets its first entry
-   race ahead of the pending arm and strand the row at `'hidden'` permanently.
-3. The observed ref is the stable outer row wrapper, never the bubble — the
-   bubble subtree is swapped during `'typing'`.
+`ChatConversation` now owns a single monotonic cursor:
+- Scroll only decides *how far* the cursor may run (`maxEntered`); the cursor
+  alone decides *what resolves next*, always one message at a time, in order.
+- Pacing lives on the cursor: `TYPING_MS` before a Norn bubble,
+  `CLIENT_BEAT_MS` before a client one. Rows hold no timers at all.
+- Once the visitor is `CATCHUP_BACKLOG` messages ahead, pacing drops to
+  `CATCHUP_MS` and typing dots are suppressed. Dots are for pacing, not for
+  making someone who already scrolled past wait.
+- The drain effect depends on a `canAdvance` **boolean**, not on `maxEntered`.
+  Depending on the number would clear and reschedule the timer on every row
+  that enters during a fast scroll, and the cursor would never advance.
 
-`setTimeout(..., 0)` is the repo's existing workaround for
-`react-hooks/set-state-in-effect` (`live-clock.tsx`,
+**Bottom anchoring**
+
+`ENTER_ROOT_MARGIN = '0px 0px -10% 0px'` puts the trigger just inside the lower
+edge of the viewport, so a message resolves as it rises into view rather than
+while it is still off-screen. Rows the visitor has already scrolled past never
+report as intersecting, so the observer also checks
+`boundingClientRect.top < rootBounds.bottom` directly — without that, a restored
+scroll position strands the cursor behind them.
+
+**Reveal state machine (`ChatMessageRow`, driven by the cursor)**
+
+A row derives its phase from the cursor; it owns no reveal state of its own.
+
+    not armed          → 'initial'  bubble visible, no animation classes.
+                                    What the server renders, so hydration
+                                    matches and the copy is always in the
+                                    static HTML.
+    index <  cursor    → 'shown'    text visible
+    index == typing    → 'typing'   dots over the text, which stays mounted
+                                    under `invisible` to hold the row height
+    otherwise          → 'hidden'   opacity-0
+
+`ChatConversation` arms once, in a `setTimeout(..., 0)` — the repo's existing
+workaround for `react-hooks/set-state-in-effect` (`live-clock.tsx`,
 `liquid-ether-background.tsx`). The rule does not inspect nested callbacks, so
-`setPhase` inside the timer and inside the observer callback both pass.
+`setState` inside that timer and inside the observer callback both pass. The
+reduced-motion / no-observer bail-out happens *before* arming, so those
+environments never schedule an update and never construct an observer at all.
 
-Observer options are `{ threshold: 0, rootMargin: '0px 0px -15% 0px' }`. A
+`'typing'` and `'shown'` share one animation class string, so the bubble
+animates in once and does not restart when the text replaces the dots. The
+observed ref is the stable outer row wrapper, never the bubble, whose subtree
+is swapped during `'typing'`.
+
+Observer options are `{ threshold: 0, rootMargin: ENTER_ROOT_MARGIN }`. A
 fractional threshold can never fire for a bubble taller than that fraction of
 a small viewport.
 
@@ -101,13 +129,13 @@ a small viewport.
   bubbles cap at `max-w-[80%]`. A chat reads better narrow, so desktop gains
   centring rather than a second column.
 
-**Stagger**
-- `Math.min(indexInPhase, 3) * 80ms`, indexed *within the phase*. Every row
-  observes itself, so a global index would leave late messages invisible for
-  most of a second after they are already on screen.
-- Applied as an inline `animationDelay` style. `delay-*` cannot be used:
-  Tailwind core's `delay-*` shadows tw-animate-css's and emits
-  `transition-delay`, not `animation-delay`. The same applies to the dots.
+**Pacing**
+- The cursor's own delays are the stagger. There is no per-row
+  `animationDelay`; an earlier version had one and it only added lag on top of
+  a sequence that is already serialised.
+- The typing dots do still need an inline `animationDelay`. `delay-*` cannot be
+  used anywhere here: Tailwind core's `delay-*` shadows tw-animate-css's and
+  emits `transition-delay`, not `animation-delay`.
 - Animation class names are written as full literals per branch. Tailwind's
   scanner cannot resolve `` `slide-in-from-${side}-4` ``.
 
@@ -125,10 +153,16 @@ The reference screenshot contains typos, fixed here: `burocarica` →
 - `lib/prefers-reduced-motion.ts` mirrors `is-touch-device.ts`, including the
   `matchMedia` guard. jsdom 30 provides no `window.matchMedia`; without the
   guard every render of the section throws.
-- `chat-message-row.test.tsx` stubs `IntersectionObserver` via `vi.stubGlobal`,
-  captures the callback, and drives the machine with synchronous `act()` plus
-  fake timers. It asserts on a `data-phase` attribute rather than Tailwind
+- `chat-conversation.test.tsx` stubs `IntersectionObserver` via `vi.stubGlobal`,
+  captures each row's callback, and drives the cursor with synchronous `act()`
+  plus fake timers. It asserts on a `data-phase` attribute rather than Tailwind
   class strings, which will keep changing during visual polish.
+- Its central assertion is an invariant, not a snapshot: resolved messages must
+  always form a contiguous prefix. That is what the production bug violated,
+  and it holds regardless of how the timings are later tuned.
+- Each cursor step schedules the next from a commit-time effect, so tests must
+  advance the clock one step per `act()`. One large `advanceTimersByTime` only
+  fires the first timer.
 - jsdom has no `IntersectionObserver`, so in `chat-flow-section.test.tsx` every
   row stays at `'initial'` and content assertions are plain synchronous
   `getByText`, matching the `what-we-do-section.test.tsx` archetype.

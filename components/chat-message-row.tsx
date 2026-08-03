@@ -1,19 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { User } from 'lucide-react'
 import type { ChatSender } from '@/lib/chat-flow-script'
-import { prefersReducedMotion } from '@/lib/prefers-reduced-motion'
-
-const TYPING_DURATION_MS = 700
-
-/**
- * 'initial' renders the bubble with no animation classes. It is what the server
- * emits and what the first client render produces, so hydration matches and the
- * copy is always in the DOM. Everything after it is opt-in motion.
- */
-type RevealPhase = 'initial' | 'hidden' | 'typing' | 'shown'
+import { ENTER_ROOT_MARGIN, useChatConversation } from '@/components/chat-conversation'
 
 const dotDelays = ['0ms', '150ms', '300ms']
 
@@ -54,90 +45,77 @@ export function ChatAvatar({ sender }: { sender: ChatSender }) {
 }
 
 export type ChatMessageRowProps = {
+  index: number
   sender: ChatSender
-  delayMs: number
   children: ReactNode
   footer?: ReactNode
 }
 
 export function ChatMessageRow({
+  index,
   sender,
-  delayMs,
   children,
   footer,
 }: ChatMessageRowProps) {
-  const [phase, setPhase] = useState<RevealPhase>('initial')
-  // The observer watches this stable wrapper, never the bubble: the bubble
-  // subtree is swapped out during 'typing' and would detach the observed node.
+  const conversation = useChatConversation()
   const rowRef = useRef<HTMLDivElement>(null)
+
+  const armed = conversation?.armed ?? false
+  const markEntered = conversation?.markEntered
+  // Without a provider the row simply stays visible, which is also what the
+  // server renders.
+  const phase = conversation?.phaseFor(index) ?? 'initial'
 
   useEffect(() => {
     const element = rowRef.current
-    if (!element) return
+    if (!element || !armed || !markEntered) return
+    if (typeof IntersectionObserver === 'undefined') return
 
-    let typingTimeoutId: ReturnType<typeof setTimeout> | undefined
-    let observer: IntersectionObserver | undefined
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const triggerLine = entry.rootBounds?.bottom
+          // Rows the visitor has already scrolled past never report as
+          // intersecting, so check the trigger line directly too. Otherwise a
+          // restored scroll position strands the cursor behind them.
+          const crossed =
+            entry.isIntersecting ||
+            (triggerLine !== undefined &&
+              entry.boundingClientRect.top < triggerLine)
+          if (!crossed) continue
 
-    // Deferred into a timer callback (not called synchronously here) to satisfy the
-    // react-hooks/set-state-in-effect lint rule.
-    const armTimeoutId = setTimeout(() => {
-      // Bail out before touching state so no-motion and no-observer environments
-      // never schedule an update at all.
-      if (prefersReducedMotion()) return
-      if (typeof IntersectionObserver === 'undefined') return
+          observer.disconnect()
+          markEntered(index)
+          return
+        }
+      },
+      { threshold: 0, rootMargin: ENTER_ROOT_MARGIN }
+    )
+    observer.observe(element)
 
-      setPhase('hidden')
-
-      // Created after the setPhase above, in the same callback: attaching it in
-      // the effect body lets the observer's first entry race ahead of the pending
-      // arm and strand the row at 'hidden' forever.
-      observer = new IntersectionObserver(
-        (entries) => {
-          if (!entries.some((entry) => entry.isIntersecting)) return
-          observer?.disconnect()
-
-          if (sender === 'norn') {
-            setPhase('typing')
-            typingTimeoutId = setTimeout(
-              () => setPhase('shown'),
-              TYPING_DURATION_MS
-            )
-            return
-          }
-
-          setPhase('shown')
-        },
-        { threshold: 0, rootMargin: '0px 0px -15% 0px' }
-      )
-      observer.observe(element)
-    }, 0)
-
-    return () => {
-      clearTimeout(armTimeoutId)
-      clearTimeout(typingTimeoutId)
-      observer?.disconnect()
-    }
-  }, [sender])
+    return () => observer.disconnect()
+  }, [armed, index, markEntered])
 
   const isNorn = sender === 'norn'
 
-  // Full class literals per branch: Tailwind's scanner cannot resolve
-  // template-built names like `slide-in-from-${side}-4`.
+  // 'typing' and 'shown' deliberately share one class string so the bubble
+  // animates in once and does not restart when the text replaces the dots.
+  // Full literals per branch: Tailwind's scanner cannot resolve names built
+  // from a template like `slide-in-from-${side}-4`.
   const revealClass =
-    phase === 'hidden'
-      ? 'opacity-0'
-      : phase === 'shown'
-        ? isNorn
+    phase === 'initial'
+      ? ''
+      : phase === 'hidden'
+        ? 'opacity-0'
+        : isNorn
           ? 'animate-in fade-in slide-in-from-right-4 duration-500 fill-mode-both'
           : 'animate-in fade-in slide-in-from-left-4 duration-500 fill-mode-both'
-        : ''
 
   return (
     <div
       ref={rowRef}
       data-testid="chat-row"
       data-phase={phase}
-      style={phase === 'shown' ? { animationDelay: `${delayMs}ms` } : undefined}
       className={`flex items-end gap-3 ${isNorn ? 'flex-row-reverse' : ''} ${revealClass}`}
     >
       <ChatAvatar sender={sender} />
