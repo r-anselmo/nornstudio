@@ -37,14 +37,43 @@ CSS properties per card per event. With four cards that is sixteen style writes
 on every pointer move, plus four copies of the same `<style>` tag injected via
 `dangerouslySetInnerHTML`.
 
-Here `SpotlightGroup` owns a single listener and writes `--pointer-x` /
-`--pointer-y` once, on itself. Custom properties inherit, so every card reads
-them for free. Combined with `background-attachment: fixed`, all cards share one
-viewport coordinate space and the highlight reads as a single light passing over
-the group rather than four separate glows.
+Here `SpotlightGroup` owns a single driver. It keeps one light position in the
+group's coordinate space and writes it to each card already translated into that
+card's own box, as `--spot-x` / `--spot-y`. One light, four windows onto it, so
+it reads as a single source passing over the group rather than four separate
+glows. Work is coalesced into `requestAnimationFrame`, so a burst of pointer
+events costs one write per card per paint rather than one per event, and the
+group's rect is read once per frame rather than once per card.
 
-The listener coalesces into `requestAnimationFrame`, so a burst of pointer
-events costs one style write per paint rather than one per event.
+**Auto mode on touch (revised after production feedback)**
+
+There is no cursor on a phone, so the first version gated the whole effect
+behind `(hover: hover) and (pointer: fine)` and left touch devices with a plain
+card. That reads as dead. `SpotlightGroup` now mirrors the hero: `isTouchDevice()`
+switches it to an auto driver, the same fallback `LiquidEther` uses for its
+`autoDemo`, and an `IntersectionObserver` parks the loop whenever the section is
+off screen, exactly as `LiquidEther` parks its render loop.
+
+The auto path sweeps horizontally across the group while its vertical position
+is anchored to the middle of the viewport, so the light stays on whichever card
+is actually being read, with a slow drift so it never sits perfectly still.
+
+Auto mode is suppressed under `prefers-reduced-motion`. The pointer-driven path
+is not: that one is direct manipulation, like a hover state, and suppressing it
+would remove feedback rather than remove motion.
+
+**Card-local coordinates, not `background-attachment: fixed`**
+
+Sharing one viewport coordinate space via `background-attachment: fixed` is the
+cheaper trick and is what the original does, but Safari on iOS does not honour
+fixed attachment — it paints those gradients as if they scrolled. That would
+misplace the highlight on exactly the devices auto mode exists for. The driver
+therefore does the translation in JS and each card positions its gradient in its
+own box, which behaves identically everywhere.
+
+Card offsets are read relative to the group (which is `position: relative`), so
+unlike viewport rects they only change on layout and are re-measured on resize
+rather than every frame.
 
 **CSS lives in `globals.css`, not in the component**
 
@@ -55,15 +84,6 @@ instead. Only effect-specific properties are set there (`background-image`,
 `background-attachment`, `background-repeat`, `position`), so unlayered CSS
 never fights the Tailwind utilities that handle colour, spacing and radius on
 the same element.
-
-**Gated on a fine pointer**
-
-The whole block sits behind `@media (hover: hover) and (pointer: fine)`, and
-`SpotlightGroup` skips its listener via the existing `isTouchDevice()` helper.
-With no cursor there is nothing to follow, and viewport-fixed gradients would
-still cost repaints on every scroll — a real concern on a page that already
-ships a WebGL hero. Touch devices get the plain card surface, which is exactly
-what the reference mockup shows.
 
 **The rim**
 
@@ -99,12 +119,17 @@ The reference contains `Nossos serviço` (singular) and `O importante é comece
 agora`. Corrected to `Nossos serviços` and `O importante é começar agora`.
 
 **Testing**
-- `spotlight-card.test.tsx` asserts the group publishes the pointer position,
-  that a burst of moves coalesces into one frame, that touch devices are not
-  tracked, and that the listener detaches on unmount. jsdom in the Vitest
-  environment provides both `PointerEvent` and `requestAnimationFrame`;
-  `vi.advanceTimersToNextFrame()` drives the coalescing.
-- The visual effect itself is not covered by tests — it is pure CSS painting.
+- `spotlight-card.test.tsx` covers both drivers: with a pointer, that the light
+  lands in card-local coordinates and that a burst of moves coalesces into one
+  frame; on touch, that the group drives the light itself once on screen, stays
+  idle until it scrolls into view, stops when it scrolls away, ignores the
+  pointer, and holds still under reduced motion.
+- jsdom in the Vitest environment provides `PointerEvent` and
+  `requestAnimationFrame`; `vi.advanceTimersToNextFrame()` drives both paths.
+  The matchMedia stub answers per query string, since `isTouchDevice` and
+  `prefersReducedMotion` both read it and the tests need them to disagree.
+- Verified the auto-mode tests fail when the loop is deliberately not started.
+- The visual result itself is not covered — it is pure CSS painting.
 
 ## Out of scope
 

@@ -133,55 +133,55 @@
 }
 
 /* Spotlight cards -----------------------------------------------------------
-   A lime highlight that tracks the pointer across a whole card group.
+   A lime highlight that travels across a whole card group.
 
-   `--pointer-x` / `--pointer-y` are viewport coordinates written once on the
-   group by SpotlightGroup and inherited by every card. Paired with
-   `background-attachment: fixed`, all cards share that one coordinate space,
-   so the effect reads as a single light source moving over the group instead
-   of four independent glows.
+   `--spot-x` / `--spot-y` are written per card by SpotlightGroup, already
+   translated into that card's own box. There is one light position in the
+   group's coordinate space and each card renders its slice of it, so the
+   effect reads as a single source passing over the group rather than four
+   independent glows. With a pointer the light follows the cursor; on touch
+   the group drives it, the same auto mode the hero falls back to.
 
-   Gated on a fine pointer: with no cursor to follow there is nothing to show,
-   and the fixed-attachment gradients would still cost repaints on scroll.
-   Touch devices get the plain card surface, which is what the reference
-   mockup shows anyway. */
-@media (hover: hover) and (pointer: fine) {
-  .spotlight-card {
-    --spotlight-size: 340px;
-    --spotlight-edge: 1px;
+   Card-local coordinates rather than viewport ones with
+   `background-attachment: fixed`: Safari on iOS does not honour fixed
+   attachment and paints those gradients as if they scrolled, which would
+   misplace the highlight on exactly the devices auto mode exists for.
 
-    position: relative;
-    background-image: radial-gradient(
-      var(--spotlight-size) var(--spotlight-size) at
-        calc(var(--pointer-x, -9999) * 1px) calc(var(--pointer-y, -9999) * 1px),
-      color-mix(in oklab, var(--color-lime) 14%, transparent),
-      transparent 70%
-    );
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-  }
+   Until the first frame lands the fallback parks the gradient far off the
+   card, so nothing glows. */
+.spotlight-card {
+  --spotlight-size: 340px;
+  --spotlight-edge: 1px;
 
-  /* The lime rim. The pseudo-element spans the card's border box exactly
-     (`inset: -1px` against the padding box), then the mask subtracts its
-     content box so only the 1px ring survives. */
-  .spotlight-card::before {
-    content: '';
-    position: absolute;
-    inset: calc(var(--spotlight-edge) * -1);
-    border: var(--spotlight-edge) solid transparent;
-    border-radius: inherit;
-    background-image: radial-gradient(
-      calc(var(--spotlight-size) * 0.65) calc(var(--spotlight-size) * 0.65) at
-        calc(var(--pointer-x, -9999) * 1px) calc(var(--pointer-y, -9999) * 1px),
-      var(--color-lime),
-      transparent 70%
-    );
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    mask:
-      linear-gradient(#fff, #fff) content-box,
-      linear-gradient(#fff, #fff);
-    mask-composite: exclude;
-    pointer-events: none;
-  }
+  position: relative;
+  background-image: radial-gradient(
+    var(--spotlight-size) var(--spotlight-size) at
+      calc(var(--spot-x, -9999) * 1px) calc(var(--spot-y, -9999) * 1px),
+    color-mix(in oklab, var(--color-lime) 14%, transparent),
+    transparent 70%
+  );
+  background-repeat: no-repeat;
+}
+
+/* The lime rim. The pseudo-element spans the card's border box exactly
+   (`inset: -1px` against the padding box), then the mask subtracts its
+   content box so only the 1px ring survives. */
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--spotlight-edge) * -1);
+  border: var(--spotlight-edge) solid transparent;
+  border-radius: inherit;
+  background-image: radial-gradient(
+    calc(var(--spotlight-size) * 0.65) calc(var(--spotlight-size) * 0.65) at
+      calc(var(--spot-x, -9999) * 1px) calc(var(--spot-y, -9999) * 1px),
+    var(--color-lime),
+    transparent 70%
+  );
+  background-repeat: no-repeat;
+  mask:
+    linear-gradient(#fff, #fff) content-box,
+    linear-gradient(#fff, #fff);
+  mask-composite: exclude;
+  pointer-events: none;
 }
