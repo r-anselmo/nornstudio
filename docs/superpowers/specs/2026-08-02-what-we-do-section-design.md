@@ -33,7 +33,9 @@ homepage, matching the reference screenshot on mobile, with a proposed
   continuity between sections.
 
 **Content (final copy, from the reference)**
-- Eyebrow tag: "O que estamos fazendo" — bordered pill, lime text/border
+- Eyebrow tag: "O que estamos fazendo" — originally a bordered lime pill, later
+  switched to the shared `SectionEyebrow` brackets once the other sections
+  established that pattern
 - Manifesto card: label "manifesto.txt" (top-right, muted, monospace-ish),
   quote-mark icon (`lucide-react` `Quote`), two-line headline "Decidimos o
   caminho." / "Movemos o crescimento." (`font-heading`), body paragraph

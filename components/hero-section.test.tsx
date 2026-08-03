@@ -33,7 +33,7 @@ describe('HeroSection', () => {
   it('renders the logo mark', () => {
     render(<HeroSection />)
 
-    expect(screen.getByText('N')).toBeInTheDocument()
+    expect(screen.getByTestId('norn-mark')).toBeInTheDocument()
   })
 
   it('renders the bottom info row', () => {

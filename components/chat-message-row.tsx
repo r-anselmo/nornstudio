@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { User } from 'lucide-react'
 import type { ChatSender } from '@/lib/chat-flow-script'
 import { ENTER_ROOT_MARGIN, useChatConversation } from '@/components/chat-conversation'
+import { NornBadge } from '@/components/ui/norn-badge'
 
 const dotDelays = ['0ms', '150ms', '300ms']
 
@@ -28,13 +29,9 @@ export function ChatTypingDots() {
 
 export function ChatAvatar({ sender }: { sender: ChatSender }) {
   if (sender === 'norn') {
-    return (
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime">
-        <span className="font-heading text-lg font-black text-carbon-black">
-          N
-        </span>
-      </span>
-    )
+    // rounded-xl, not the badge default, so it matches the client avatar
+    // sitting opposite it in the thread.
+    return <NornBadge className="rounded-xl" />
   }
 
   return (

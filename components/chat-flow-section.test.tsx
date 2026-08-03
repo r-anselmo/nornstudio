@@ -72,7 +72,9 @@ describe('ChatFlowSection', () => {
       .flatMap((phase) => phase.messages)
       .filter((message) => message.sender === 'norn')
 
-    expect(screen.getAllByText('N')).toHaveLength(nornMessages.length)
+    expect(screen.getAllByTestId('norn-mark')).toHaveLength(
+      nornMessages.length
+    )
   })
 
   it('closes with a typing indicator', () => {

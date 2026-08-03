@@ -19,14 +19,14 @@ describe('ChatMessageRow', () => {
     expect(screen.getByText('Queremos escalar')).toBeInTheDocument()
   })
 
-  it('marks a norn message with the lime bubble edge and the N avatar', () => {
+  it('marks a norn message with the lime bubble edge and the brand badge', () => {
     render(
       <ChatMessageRow index={0} sender="norn">
         Qual métrica te tira o sono hoje?
       </ChatMessageRow>
     )
 
-    expect(screen.getByText('N')).toBeInTheDocument()
+    expect(screen.getByTestId('norn-mark')).toBeInTheDocument()
     expect(
       screen.getByText('Qual métrica te tira o sono hoje?').parentElement
         ?.className

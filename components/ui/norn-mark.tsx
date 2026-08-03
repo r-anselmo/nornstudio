@@ -18,6 +18,7 @@ export function NornMark({ className }: { className?: string }) {
       viewBox="176 189 724 725"
       fill="currentColor"
       aria-hidden="true"
+      data-testid="norn-mark"
       className={className}
     >
       <path d={MARK_PATH} />

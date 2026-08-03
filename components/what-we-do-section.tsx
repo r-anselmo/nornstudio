@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { SpotlightCard, SpotlightGroup } from '@/components/ui/spotlight-card'
+import { SectionEyebrow } from '@/components/ui/section-eyebrow'
 
 type Skill = {
   label: string
@@ -30,9 +31,7 @@ export function WhatWeDoSection() {
   return (
     <section className="bg-carbon-black px-6 py-16 md:px-12 md:py-24">
       <div className="mx-auto flex max-w-5xl flex-col gap-6">
-        <span className="inline-flex w-fit items-center rounded-md border border-lime/40 px-3 py-1 font-body text-xs font-medium tracking-[0.02em] text-lime">
-          O que estamos fazendo
-        </span>
+        <SectionEyebrow>O que estamos fazendo</SectionEyebrow>
 
         <SpotlightGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 md:col-span-2">

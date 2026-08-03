@@ -13,7 +13,7 @@ describe('SiteFooter', () => {
   it('carries the brand mark and tagline', () => {
     render(<SiteFooter />)
 
-    expect(screen.getByText('N')).toBeInTheDocument()
+    expect(screen.getByTestId('norn-mark')).toBeInTheDocument()
     expect(screen.getByText(footerTagline)).toBeInTheDocument()
   })
 

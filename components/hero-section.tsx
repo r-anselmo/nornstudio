@@ -1,5 +1,6 @@
 import { LiquidEtherBackground } from '@/components/liquid-ether-background'
 import { LiveClock } from '@/components/live-clock'
+import { NornBadge } from '@/components/ui/norn-badge'
 
 export function HeroSection() {
   return (
@@ -10,11 +11,7 @@ export function HeroSection() {
 
       <div className="relative z-10 flex flex-1 flex-col">
         <header className="flex items-center gap-4">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-lime">
-            <span className="font-heading text-lg font-black text-carbon-black">
-              N
-            </span>
-          </div>
+          <NornBadge />
           <div className="h-px flex-1 bg-alabaster/30" />
           <LiveClock />
         </header>

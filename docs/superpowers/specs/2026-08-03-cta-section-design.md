@@ -59,9 +59,9 @@ Sizing was set from rendered screenshots at both widths. The first mobile size
 (`w-56`) left too little of the glyph clear of the button to be recognisable —
 it read as a smudge — so mobile runs at `w-80`.
 
-**Still placeholders elsewhere.** The hero header, the chat avatars and the
-footer all render the letter "N" as text. Now that a real mark exists they could
-use `NornMark` instead; that was out of scope for this change.
+**Resolved since.** The hero header, the chat avatars and the footer used to
+render the letter "N" as text. They now share `components/ui/norn-badge.tsx` —
+the mark on its lime tile — so the real artwork is the only mark on the page.
 
 **The button destination is a placeholder**
 

@@ -1,4 +1,5 @@
 import { footerLinks, footerSignature, footerTagline } from '@/lib/footer'
+import { NornBadge } from '@/components/ui/norn-badge'
 
 export function SiteFooter() {
   // Evaluated at prerender, so a rebuild refreshes it rather than leaving a
@@ -10,11 +11,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-5xl flex-col gap-10">
         {/* Echoes the hero header, closing the page with the mark it opened on. */}
         <div className="flex items-center gap-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-lime">
-            <span className="font-heading text-lg font-black text-carbon-black">
-              N
-            </span>
-          </div>
+          <NornBadge />
           <div className="h-px flex-1 bg-alabaster/30" />
         </div>
 

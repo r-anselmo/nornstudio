@@ -120,9 +120,9 @@ a small viewport.
 - Norn bubbles carry `border-r-2 border-r-lime` — the lime arc in the reference
   is the right border following the `rounded-2xl` corner. `border-r-lime` alone
   renders nothing; preflight zeroes `border-width`.
-- The eyebrow uses lime bracket corners, per the reference. `WhatWeDoSection`
-  uses a bordered pill instead; unifying the two eyebrow styles is a separate
-  decision, deliberately out of scope here.
+- The eyebrow uses lime bracket corners, per the reference. This was the first
+  section to use them; `WhatWeDoSection` kept its older bordered pill for a
+  while, and every section now shares `components/ui/section-eyebrow.tsx`.
 
 **Responsive**
 - Chat is a `max-w-2xl` column centred inside the `max-w-5xl` container;
