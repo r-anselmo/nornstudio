@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { cabinetGrotesk, generalSans } from './fonts'
+import { motionGateScript } from '@/lib/motion'
+import { ContactDialogProvider } from '@/components/contact-dialog-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -18,7 +20,12 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${cabinetGrotesk.variable} ${generalSans.variable}`}
     >
-      <body className="font-body antialiased">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: motionGateScript }} />
+      </head>
+      <body className="font-body antialiased">
+        <ContactDialogProvider>{children}</ContactDialogProvider>
+      </body>
     </html>
   )
 }

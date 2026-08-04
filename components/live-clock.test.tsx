@@ -27,4 +27,12 @@ describe('LiveClock', () => {
     })
     expect(screen.getByText('LIVE · 17:02:14')).toBeInTheDocument()
   })
+
+  it('reserves its width before the time resolves', () => {
+    render(<LiveClock />)
+
+    // Rendering nothing until hydration shifts everything beside it in the
+    // hero header. The placeholder is the same shape as HH:MM:SS.
+    expect(screen.getByText('LIVE · --:--:--')).toBeInTheDocument()
+  })
 })

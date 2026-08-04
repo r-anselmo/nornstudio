@@ -4,6 +4,7 @@ import { ChatPhaseDivider } from './chat-phase-divider'
 import { ChatConversation, CLIENT_BEAT_MS } from './chat-conversation'
 import { ChatMessageRow } from './chat-message-row'
 import type { ChatSender } from '@/lib/chat-flow-script'
+import { MOTION_GATE_CLASS } from '@/lib/motion'
 
 function label() {
   return screen.getByRole('heading', { level: 3 })
@@ -47,12 +48,16 @@ describe('ChatPhaseDivider inside a conversation', () => {
     observers = []
     vi.useFakeTimers()
     vi.stubGlobal('IntersectionObserver', IntersectionObserverStub)
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }))
+    // The gate replaces the old matchMedia + IntersectionObserver checks:
+    // the head script resolves both before first paint, and the conversation
+    // reads only its result.
+    document.documentElement.classList.add(MOTION_GATE_CLASS)
   })
 
   afterEach(() => {
     vi.useRealTimers()
     vi.unstubAllGlobals()
+    document.documentElement.classList.remove(MOTION_GATE_CLASS)
   })
 
   function renderDivider() {

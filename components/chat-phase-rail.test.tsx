@@ -5,6 +5,7 @@ import { ChatConversation, CLIENT_BEAT_MS, TYPING_MS } from './chat-conversation
 import { ChatMessageRow } from './chat-message-row'
 import type { RailPhase } from '@/lib/chat-rail-progress'
 import type { ChatSender } from '@/lib/chat-flow-script'
+import { MOTION_GATE_CLASS } from '@/lib/motion'
 
 const phases: RailPhase[] = [
   { step: '01', count: 2 },
@@ -85,12 +86,16 @@ describe('ChatPhaseRail driven by the conversation', () => {
     observers = []
     vi.useFakeTimers()
     vi.stubGlobal('IntersectionObserver', IntersectionObserverStub)
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }))
+    // The gate replaces the old matchMedia + IntersectionObserver checks:
+    // the head script resolves both before first paint, and the conversation
+    // reads only its result.
+    document.documentElement.classList.add(MOTION_GATE_CLASS)
   })
 
   afterEach(() => {
     vi.useRealTimers()
     vi.unstubAllGlobals()
+    document.documentElement.classList.remove(MOTION_GATE_CLASS)
   })
 
   function renderRail() {
@@ -153,8 +158,8 @@ describe('ChatPhaseRail driven by the conversation', () => {
     expect(nodeStates()).toEqual(['complete', 'complete'])
   })
 
-  it('stays complete when the user prefers reduced motion', () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }))
+  it('stays complete when the motion gate is absent', () => {
+    document.documentElement.classList.remove(MOTION_GATE_CLASS)
 
     renderRail()
     arm()

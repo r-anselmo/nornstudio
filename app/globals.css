@@ -129,6 +129,20 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  /* The anchors land flush against the viewport top otherwise, with the
+     section eyebrow touching the edge. Scoped to sections because they are the
+     only anchor targets — a bare [id] also caught every useId-generated form
+     field and every internal id Base UI mints. */
+  section[id] {
+    scroll-margin-top: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
@@ -184,4 +198,124 @@
     linear-gradient(#fff, #fff);
   mask-composite: exclude;
   pointer-events: none;
+}
+
+/* Motion tokens -------------------------------------------------------------
+   Durations and easings used to be scattered literals — duration-500,
+   duration-700, TYPING_MS, takeoverDuration — with `ease-out` appearing
+   exactly once and everything else falling back to the browser default. The
+   chat thread's 500s and 700s now read from this scale too, so the numbers
+   exist in one place.
+
+   Easings go in @theme because Tailwind's --ease-* namespace generates
+   utilities from them. Durations cannot: Tailwind 4.3 has no --duration-*
+   namespace (a --duration-base in @theme emits the variable but no class), so
+   the scale is declared as real utilities instead. */
+@theme {
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-chat-typing: chat-typing 1400ms var(--ease-out-quad) infinite;
+}
+
+/* Both properties, matching Tailwind's own duration-* utilities: transitions
+   read transition-duration, but the animate-* utilities read --tw-duration,
+   so setting only the former makes these silently inert on animations. */
+@utility duration-instant {
+  --tw-duration: 120ms;
+  transition-duration: 120ms;
+}
+@utility duration-fast {
+  --tw-duration: 200ms;
+  transition-duration: 200ms;
+}
+@utility duration-base {
+  --tw-duration: 320ms;
+  transition-duration: 320ms;
+}
+@utility duration-slow {
+  --tw-duration: 520ms;
+  transition-duration: 520ms;
+}
+@utility duration-deliberate {
+  --tw-duration: 700ms;
+  transition-duration: 700ms;
+}
+
+/* The site had no focus styling at all, and the inherited --ring is a mid-grey
+   that disappears against carbon-black.
+   Two-tone rather than a single lime ring: the CTA section is itself lime, so
+   a lime-on-lime outline there is invisible. The carbon halo sits outside the
+   lime ring, so the indicator reads on the dark sections and on the lime one
+   without the caller having to pick a variant. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--color-carbon-black);
+  }
+}
+
+@keyframes chat-typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+/* Scroll reveals ------------------------------------------------------------
+   The hidden-initial state is CSS gated on `.js-motion`, not React state.
+   React settles after hydration, which is after first paint — so a
+   state-driven reveal paints its content and then blanks it. The gate class
+   lands before first paint, so the element is hidden from frame one, while the
+   server HTML stays fully visible for no-JS, reduced motion and crawlers. */
+[data-reveal] {
+  transition:
+    opacity 520ms var(--ease-out-expo),
+    transform 520ms var(--ease-out-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js-motion [data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* Same mechanism for the chat thread, which had exactly this bug: all twelve
+   messages painted, then blanked when `armed` flipped. */
+.js-motion [data-chat-row][data-phase='initial'] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: none;
+  }
+}
+
+/* Contact dialog field stagger ---------------------------------------------
+   Driven entirely by the attribute Base UI puts on the popup while it opens,
+   so there is no JS timing to keep in sync with the CSS. */
+.contact-field {
+  transition:
+    opacity 320ms var(--ease-out-expo),
+    transform 320ms var(--ease-out-expo);
+  transition-delay: var(--field-delay, 0ms);
+}
+
+[data-starting-style] .contact-field {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-field {
+    transition: none;
+  }
 }

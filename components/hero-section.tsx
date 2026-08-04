@@ -1,6 +1,10 @@
 import { LiquidEtherBackground } from '@/components/liquid-ether-background'
 import { LiveClock } from '@/components/live-clock'
 import { NornBadge } from '@/components/ui/norn-badge'
+import { Reveal } from '@/components/ui/reveal'
+import { STAGGER_MS } from '@/lib/motion'
+import { ContactTrigger } from '@/components/contact-trigger'
+import { ctaLabel } from '@/lib/cta'
 
 export function HeroSection() {
   return (
@@ -17,38 +21,49 @@ export function HeroSection() {
         </header>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
-          <h1 className="font-heading text-4xl font-black leading-[1.05] tracking-[0.02em] text-alabaster md:text-6xl lg:text-7xl">
-            <span className="block">TODO MUNDO</span>
-            <span className="block">FALA EM</span>
-            <span className="block">ESTRATÉGIA.</span>
-            <span className="mt-2 block rounded-xl bg-lime px-4 py-1 text-carbon-black">
-              A GENTE
-            </span>
-            <span className="mt-2 block rounded-xl bg-lime px-4 py-1 text-carbon-black">
-              EXECUTA.
-            </span>
-          </h1>
+          <Reveal>
+            <h1 className="font-heading text-4xl font-black leading-[1.05] tracking-[0.02em] text-alabaster md:text-6xl lg:text-7xl">
+              <span className="block">TODO MUNDO</span>
+              <span className="block">FALA EM</span>
+              <span className="block">ESTRATÉGIA.</span>
+              <span className="mt-2 block rounded-xl bg-lime px-4 py-1 text-carbon-black">
+                A GENTE
+              </span>
+              <span className="mt-2 block rounded-xl bg-lime px-4 py-1 text-carbon-black">
+                EXECUTA.
+              </span>
+            </h1>
+          </Reveal>
 
-          <p className="max-w-sm font-body text-base text-platinum-gray md:text-lg">
-            Do experimento ao resultado: a gente acelera suas iniciativas
-            digitais por dentro.
-          </p>
+          <Reveal delay={STAGGER_MS}>
+            <p className="max-w-sm font-body text-base text-platinum-gray md:text-lg">
+              Do experimento ao resultado: a gente acelera suas iniciativas
+              digitais por dentro.
+            </p>
+          </Reveal>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#contato"
-              className="flex items-center gap-2 rounded-full border border-lime px-6 py-3 font-body text-sm font-medium text-lime"
-            >
-              Iniciar Projeto
-              <span aria-hidden="true">→</span>
-            </a>
-            <a
-              href="#servicos"
-              className="font-body text-sm font-medium text-lime"
-            >
-              Ver serviços
-            </a>
-          </div>
+          <Reveal delay={STAGGER_MS * 2}>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <ContactTrigger className="focus-ring group flex items-center gap-2 rounded-full border border-lime px-6 py-3 font-body text-sm font-medium text-lime transition-colors duration-instant hover:bg-lime hover:text-carbon-black motion-reduce:transition-none">
+                {ctaLabel}
+                <span
+                  aria-hidden="true"
+                  className="transition-transform duration-fast group-hover:translate-x-0.5 motion-reduce:transition-none"
+                >
+                  →
+                </span>
+              </ContactTrigger>
+              <a
+                href="#servicos"
+                // Underline wipes in from the left rather than appearing at full
+                // width: a 0%-to-100% background-size is the only way to animate
+                // an underline, since text-decoration cannot be transitioned.
+                className="focus-ring rounded-sm bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat pb-1 font-body text-sm font-medium text-lime transition-[background-size] duration-fast ease-out-quad hover:bg-[length:100%_1px] motion-reduce:transition-none"
+              >
+                Ver serviços
+              </a>
+            </div>
+          </Reveal>
         </div>
 
         <footer className="flex items-end justify-between font-body text-xs font-medium tracking-[0.02em] text-alabaster">

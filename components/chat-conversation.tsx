@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { ChatSender } from '@/lib/chat-flow-script'
-import { prefersReducedMotion } from '@/lib/prefers-reduced-motion'
+import { isMotionEnabled } from '@/lib/motion'
 
 /** How long Norn "types" before its bubble resolves. */
 export const TYPING_MS = 650
@@ -64,8 +64,10 @@ export function ChatConversation({
     // Deferred into a timer callback (not called synchronously here) to satisfy the
     // react-hooks/set-state-in-effect lint rule.
     const timeoutId = setTimeout(() => {
-      if (prefersReducedMotion()) return
-      if (typeof IntersectionObserver === 'undefined') return
+      // One gate for both halves of the reveal: globals.css hides the rows off
+      // the same class, so the cursor can never be left unable to advance rows
+      // the stylesheet has already hidden.
+      if (!isMotionEnabled()) return
       setArmed(true)
     }, 0)
     return () => clearTimeout(timeoutId)

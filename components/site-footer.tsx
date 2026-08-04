@@ -1,5 +1,7 @@
-import { footerLinks, footerSignature, footerTagline } from '@/lib/footer'
+import { brandSignature, footerLinks, footerTagline } from '@/lib/footer'
 import { NornBadge } from '@/components/ui/norn-badge'
+import { Reveal } from '@/components/ui/reveal'
+import { STAGGER_MS } from '@/lib/motion'
 
 export function SiteFooter() {
   // Evaluated at prerender, so a rebuild refreshes it rather than leaving a
@@ -15,7 +17,9 @@ export function SiteFooter() {
           <div className="h-px flex-1 bg-alabaster/30" />
         </div>
 
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+        {/* The badge row and the divider stay static: they echo the hero header
+            and the rule reads as chrome, not as content arriving. */}
+        <Reveal className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <p className="max-w-sm font-heading text-xl font-black leading-tight text-alabaster md:text-2xl">
             {footerTagline}
           </p>
@@ -26,7 +30,7 @@ export function SiteFooter() {
                 <li key={href}>
                   <a
                     href={href}
-                    className="font-body text-xs font-medium tracking-[0.02em] text-platinum-gray transition-colors hover:text-lime"
+                    className="focus-ring rounded-sm font-body text-xs font-medium tracking-[0.02em] text-platinum-gray transition-colors duration-instant hover:text-lime motion-reduce:transition-none"
                   >
                     {label}
                   </a>
@@ -34,14 +38,17 @@ export function SiteFooter() {
               ))}
             </ul>
           </nav>
-        </div>
+        </Reveal>
 
         <div aria-hidden="true" className="h-px bg-alabaster/10" />
 
-        <div className="flex flex-col gap-2 font-body text-xs font-medium tracking-[0.02em] md:flex-row md:items-center md:justify-between">
+        <Reveal
+          delay={STAGGER_MS}
+          className="flex flex-col gap-2 font-body text-xs font-medium tracking-[0.02em] md:flex-row md:items-center md:justify-between"
+        >
           <p className="text-alabaster">© {year} NORN</p>
-          <p className="text-platinum-gray">{footerSignature}</p>
-        </div>
+          <p className="text-platinum-gray">{brandSignature}</p>
+        </Reveal>
       </div>
     </footer>
   )
