@@ -282,3 +282,24 @@
     transition: none;
   }
 }
+
+/* Contact dialog field stagger ---------------------------------------------
+   Driven entirely by the attribute Base UI puts on the popup while it opens,
+   so there is no JS timing to keep in sync with the CSS. */
+.contact-field {
+  transition:
+    opacity 320ms var(--ease-out-expo),
+    transform 320ms var(--ease-out-expo);
+  transition-delay: var(--field-delay, 0ms);
+}
+
+[data-starting-style] .contact-field {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-field {
+    transition: none;
+  }
+}
