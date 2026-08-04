@@ -4,6 +4,12 @@ import { join } from 'node:path'
 import { MARK_PATH } from '@/components/ui/norn-mark'
 
 const icon = readFileSync(join(__dirname, 'icon.svg'), 'utf8')
+const raster = readFileSync(join(__dirname, 'icon.png'))
+
+/** Width and height out of the PNG's IHDR chunk, as big-endian uint32s. */
+function pngSize(file: Buffer) {
+  return { width: file.readUInt32BE(16), height: file.readUInt32BE(20) }
+}
 
 describe('app/icon.svg', () => {
   it('draws the real mark, not an approximation of it', () => {
@@ -25,5 +31,20 @@ describe('app/icon.svg', () => {
 
   it('is not left as a decorative image with no name', () => {
     expect(icon).toContain('aria-label="Norn"')
+  })
+})
+
+describe('app/icon.png', () => {
+  it('exists as a raster fallback, because Safari cannot render SVG favicons', () => {
+    // Shipping SVG only meant Safari ignored the tag, probed /favicon.ico,
+    // got a 404, and kept showing whatever it had cached. Both are declared
+    // now and each browser takes the one it understands.
+    expect(raster.subarray(0, 8)).toEqual(
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+    )
+  })
+
+  it('is square and big enough for a retina tab', () => {
+    expect(pngSize(raster)).toEqual({ width: 192, height: 192 })
   })
 })

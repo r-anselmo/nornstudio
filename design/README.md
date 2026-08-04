@@ -32,8 +32,21 @@ regeneration cannot ship unnoticed.
 Anything matching `apple-icon.*` inside `app/` becomes an icon route. Keeping
 the SVG here stops Next emitting a second, competing `<link rel="apple-touch-icon">`.
 
-## `app/icon.svg`
+## `app/icon.svg` and `app/icon.png`
 
-The browser favicon has no source file — it *is* the source, served as-is. It
-is the rounded variant; browsers do not mask favicons, so the rounding has to
-be in the artwork.
+The browser favicon has no separate source — `app/icon.svg` *is* the source,
+served as-is. It is the rounded variant; browsers do not mask favicons, so the
+rounding has to be in the artwork rather than left to the client.
+
+`app/icon.png` is the same artwork rasterised, and it is not optional:
+**Safari does not support SVG favicons.** With only the SVG declared, Safari
+ignores the tag, falls back to probing `/favicon.ico`, finds nothing, and keeps
+displaying whatever icon it had cached — which looks exactly like the favicon
+never changed. Both are declared, and each browser takes the one it can read.
+
+Regenerate it from the SVG after any change:
+
+```bash
+sips -s format png app/icon.svg --out /tmp/norn-icon-1024.png
+sips -z 192 192 /tmp/norn-icon-1024.png --out app/icon.png
+```
