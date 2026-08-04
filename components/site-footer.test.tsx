@@ -37,6 +37,17 @@ describe('SiteFooter', () => {
     expect(screen.getByText(brandSignature)).toBeInTheDocument()
   })
 
+  it('reveals its content blocks like every other section', () => {
+    render(<SiteFooter />)
+
+    // The motion pass named the footer alongside hero, WhatWeDo, Services and
+    // CTA; it was the one that never got wired up.
+    const revealed = screen
+      .getByRole('contentinfo')
+      .querySelectorAll('[data-reveal]')
+    expect(revealed.length).toBe(2)
+  })
+
   it('sits on the dark surface, not the lime one', () => {
     render(<SiteFooter />)
 
