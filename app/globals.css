@@ -129,6 +129,18 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  /* The anchors land flush against the viewport top otherwise, with the
+     section eyebrow touching the edge. */
+  [id] {
+    scroll-margin-top: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
