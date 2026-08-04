@@ -86,6 +86,50 @@ describe('ContactDialog', () => {
     ).toBeInTheDocument()
   })
 
+  it('marks invalid fields and links them to their message', async () => {
+    const user = userEvent.setup()
+    renderDialog()
+
+    await user.click(screen.getByRole('button', { name: 'Iniciar Projeto' }))
+    await user.click(screen.getByRole('button', { name: contactSubmitLabel }))
+
+    const nameField = await screen.findByLabelText(contactNameQuestion)
+    expect(nameField).toHaveAttribute('aria-invalid', 'true')
+
+    // The message has to be reachable from the field, or a screen reader
+    // announces the field as invalid without saying why.
+    const describedBy = nameField.getAttribute('aria-describedby')
+    expect(describedBy).toBeTruthy()
+    expect(document.getElementById(describedBy as string)).toHaveTextContent(
+      'Diz seu nome pra gente.'
+    )
+  })
+
+  it('moves focus to the first invalid field on a failed submit', async () => {
+    const user = userEvent.setup()
+    renderDialog()
+
+    await user.click(screen.getByRole('button', { name: 'Iniciar Projeto' }))
+    await user.click(screen.getByRole('button', { name: contactSubmitLabel }))
+
+    expect(await screen.findByLabelText(contactNameQuestion)).toHaveFocus()
+  })
+
+  it('clears the invalid marking once the field is corrected', async () => {
+    const user = userEvent.setup()
+    renderDialog()
+
+    await user.click(screen.getByRole('button', { name: 'Iniciar Projeto' }))
+    await user.click(screen.getByRole('button', { name: contactSubmitLabel }))
+    await user.type(screen.getByLabelText(contactNameQuestion), 'Rodrigo')
+    await user.click(screen.getByRole('button', { name: contactSubmitLabel }))
+
+    expect(screen.getByLabelText(contactNameQuestion)).toHaveAttribute(
+      'aria-invalid',
+      'false'
+    )
+  })
+
   it('submits a complete form and confirms it', async () => {
     const user = userEvent.setup()
     renderDialog()
@@ -142,6 +186,18 @@ describe('ContactDialog', () => {
     // live region nothing tells a screen reader the message actually sent.
     const status = await screen.findByRole('status')
     expect(status).toHaveTextContent(contactSuccessTitle)
+  })
+
+  it('catches focus when the confirmation replaces the form', async () => {
+    const user = userEvent.setup()
+    renderDialog()
+
+    await openAndFill(user)
+    await user.click(screen.getByRole('button', { name: contactSubmitLabel }))
+
+    // The submit button that held focus is unmounted. Without catching it,
+    // Tab escapes to the page behind the still-open dialog.
+    await waitFor(() => expect(screen.getByRole('status')).toHaveFocus())
   })
 
   it('starts clean the next time it opens', async () => {

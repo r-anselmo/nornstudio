@@ -1,8 +1,11 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { ContactDialogProvider } from './contact-dialog-provider'
+import { CtaSection } from './cta-section'
 import { ServicesSection } from './services-section'
 import { SiteFooter } from './site-footer'
 import { WhatWeDoSection } from './what-we-do-section'
+import { ctaLabel } from '@/lib/cta'
 
 vi.mock('@/components/LiquidEther', () => ({ default: () => null }))
 
@@ -13,6 +16,22 @@ describe('interaction states', () => {
     for (const link of screen.getAllByRole('link')) {
       expect(link.className).toContain('focus-ring')
     }
+  })
+
+  it('gives the CTA section trigger a focus ring', () => {
+    render(
+      <ContactDialogProvider>
+        <CtaSection />
+      </ContactDialogProvider>
+    )
+
+    // The primary conversion button sits on `bg-lime`, so the ring this class
+    // paints has to stay legible against lime itself — see the two-tone
+    // focus-ring utility in globals.css. A single lime outline there is
+    // invisible on exactly the button that matters most.
+    expect(
+      screen.getByRole('button', { name: new RegExp(ctaLabel, 'i') }).className
+    ).toContain('focus-ring')
   })
 
   it('lifts the service cards on hover', () => {

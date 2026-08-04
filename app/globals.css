@@ -231,12 +231,16 @@
 }
 
 /* The site had no focus styling at all, and the inherited --ring is a mid-grey
-   that disappears against carbon-black. Lime is the only colour on the palette
-   that survives on every surface here. */
+   that disappears against carbon-black.
+   Two-tone rather than a single lime ring: the CTA section is itself lime, so
+   a lime-on-lime outline there is invisible. The carbon halo sits outside the
+   lime ring, so the indicator reads on the dark sections and on the lime one
+   without the caller having to pick a variant. */
 @utility focus-ring {
   &:focus-visible {
     outline: 2px solid var(--color-lime);
     outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--color-carbon-black);
   }
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent, ReactNode } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
 import { ArrowRight, Loader2, X } from 'lucide-react'
@@ -88,6 +88,16 @@ function ContactDialogBody() {
   const [botcheck, setBotcheck] = useState('')
   const [errors, setErrors] = useState<ContactErrors>({})
   const [status, setStatus] = useState<Status>('idle')
+  const successRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    // The submit button that held focus is unmounted with the form and nothing
+    // else catches it, so focus falls to <body>: Tab then walks the page behind
+    // the still-open dialog and a screen reader's cursor jumps to the top of
+    // the document. Landing on the live region also makes its announcement
+    // reliable — a region inserted already containing its text often is not.
+    successRef.current?.focus()
+  }, [status])
 
   function update(field: keyof ContactValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }))
@@ -98,7 +108,19 @@ function ContactDialogBody() {
 
     const nextErrors = validateContact(values)
     setErrors(nextErrors)
-    if (!isValid(nextErrors)) return
+    if (!isValid(nextErrors)) {
+      // Without this the visitor is left on the submit button with no
+      // indication anything happened — the errors render below, out of view
+      // of a screen reader and of anyone using the keyboard.
+      const firstInvalid = (['name', 'email', 'message'] as const).find(
+        (field) => nextErrors[field]
+      )
+      const id = { name: nameId, email: emailId, message: messageId }[
+        firstInvalid ?? 'name'
+      ]
+      document.getElementById(id)?.focus()
+      return
+    }
 
     setStatus('submitting')
     const result = await submitContact({ ...values, botcheck })
@@ -108,10 +130,14 @@ function ContactDialogBody() {
   if (status === 'success') {
     return (
       <div
+        ref={successRef}
         // The submit button that held focus is gone, and without a live
         // region nothing tells a screen reader the message actually sent.
         role="status"
-        className="flex flex-col items-center gap-3 py-8 text-center"
+        // Not reachable by Tab, but focusable programmatically: it exists to
+        // catch the focus the unmounted form dropped, not to add a stop.
+        tabIndex={-1}
+        className="flex flex-col items-center gap-3 py-8 text-center focus:outline-none"
       >
         <NornMark className="w-12 animate-in fade-in zoom-in-95 text-lime duration-slow ease-spring" />
         <p className="font-heading text-xl font-black text-alabaster">
@@ -150,15 +176,17 @@ function ContactDialogBody() {
           error={errors.name}
           delayMs={0}
         >
-          <input
-            id={nameId}
-            name="name"
-            type="text"
-            autoComplete="name"
-            value={values.name}
-            onChange={(event) => update('name', event.target.value)}
-            className={fieldClass}
-          />
+          {(fieldProps) => (
+            <input
+              {...fieldProps}
+              name="name"
+              type="text"
+              autoComplete="name"
+              value={values.name}
+              onChange={(event) => update('name', event.target.value)}
+              className={fieldClass}
+            />
+          )}
         </Field>
 
         <Field
@@ -167,15 +195,17 @@ function ContactDialogBody() {
           error={errors.email}
           delayMs={90}
         >
-          <input
-            id={emailId}
-            name="email"
-            type="email"
-            autoComplete="email"
-            value={values.email}
-            onChange={(event) => update('email', event.target.value)}
-            className={fieldClass}
-          />
+          {(fieldProps) => (
+            <input
+              {...fieldProps}
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={values.email}
+              onChange={(event) => update('email', event.target.value)}
+              className={fieldClass}
+            />
+          )}
         </Field>
 
         <Field
@@ -184,14 +214,16 @@ function ContactDialogBody() {
           error={errors.message}
           delayMs={180}
         >
-          <textarea
-            id={messageId}
-            name="message"
-            rows={4}
-            value={values.message}
-            onChange={(event) => update('message', event.target.value)}
-            className={`${fieldClass} resize-none`}
-          />
+          {(fieldProps) => (
+            <textarea
+              {...fieldProps}
+              name="message"
+              rows={4}
+              value={values.message}
+              onChange={(event) => update('message', event.target.value)}
+              className={`${fieldClass} resize-none`}
+            />
+          )}
         </Field>
 
         {status === 'error' && (
@@ -233,6 +265,11 @@ function ContactDialogBody() {
 
 // Module scope, not nested inside ContactDialog: react-hooks/static-components
 // is error-level in this repo.
+//
+// Takes a render callback rather than plain children so it can hand the input
+// the wiring only it knows about — the generated error id, and whether there is
+// currently an error to point at. The form is `noValidate`, so nothing else
+// tells a screen reader a field was rejected.
 function Field({
   id,
   label,
@@ -244,8 +281,14 @@ function Field({
   label: string
   error?: string
   delayMs: number
-  children: ReactNode
+  children: (fieldProps: {
+    id: string
+    'aria-invalid': boolean
+    'aria-describedby': string | undefined
+  }) => ReactNode
 }) {
+  const errorId = `${id}-error`
+
   return (
     <div
       className="contact-field flex flex-col gap-2"
@@ -259,9 +302,18 @@ function Field({
       >
         {label}
       </label>
-      {children}
+      {children({
+        id,
+        'aria-invalid': Boolean(error),
+        // Pointing at the message only while it exists: a dangling
+        // aria-describedby is announced as nothing at all on some readers.
+        'aria-describedby': error ? errorId : undefined,
+      })}
       {error && (
-        <p className="font-body text-xs text-lime animate-in fade-in duration-fast">
+        <p
+          id={errorId}
+          className="font-body text-xs text-lime animate-in fade-in duration-fast"
+        >
           {error}
         </p>
       )}
