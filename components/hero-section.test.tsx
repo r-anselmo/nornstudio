@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { render, screen, act } from '@testing-library/react'
 import { HeroSection } from './hero-section'
 
 const { liquidEtherMock } = vi.hoisted(() => ({
@@ -11,6 +11,19 @@ vi.mock('@/components/LiquidEther', () => ({
 }))
 
 describe('HeroSection', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockReturnValue({ matches: false })
+    )
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
   it('renders the headline, subtext, and both CTAs', () => {
     render(<HeroSection />)
 
@@ -49,6 +62,9 @@ describe('HeroSection', () => {
 
   it('mounts the LiquidEther background', () => {
     render(<HeroSection />)
+    act(() => {
+      vi.advanceTimersByTime(0)
+    })
 
     expect(liquidEtherMock).toHaveBeenCalled()
   })
