@@ -214,19 +214,27 @@
   --animate-chat-typing: chat-typing 1400ms var(--ease-out-quad) infinite;
 }
 
+/* Both properties, matching Tailwind's own duration-* utilities: transitions
+   read transition-duration, but the animate-* utilities read --tw-duration,
+   so setting only the former makes these silently inert on animations. */
 @utility duration-instant {
+  --tw-duration: 120ms;
   transition-duration: 120ms;
 }
 @utility duration-fast {
+  --tw-duration: 200ms;
   transition-duration: 200ms;
 }
 @utility duration-base {
+  --tw-duration: 320ms;
   transition-duration: 320ms;
 }
 @utility duration-slow {
+  --tw-duration: 520ms;
   transition-duration: 520ms;
 }
 @utility duration-deliberate {
+  --tw-duration: 700ms;
   transition-duration: 700ms;
 }
 
