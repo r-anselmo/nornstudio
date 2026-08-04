@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "generate:og": "node scripts/generate-og-image.mjs",
+    "prebuild": "npm run generate:og",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

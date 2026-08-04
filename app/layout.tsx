@@ -20,8 +20,7 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     type: 'website',
     url: siteUrl,
-    // The image itself comes from app/opengraph-image.tsx by file convention;
-    // listing it here too would emit a second, competing og:image tag.
+    images: [{ url: '/opengraph-image.png', width: 1200, height: 630, alt: siteName }],
   },
   twitter: {
     // Next points twitter:image at the same generated file, so there is no
