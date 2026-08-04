@@ -26,7 +26,7 @@ export function SiteFooter() {
                 <li key={href}>
                   <a
                     href={href}
-                    className="font-body text-xs font-medium tracking-[0.02em] text-platinum-gray transition-colors hover:text-lime"
+                    className="focus-ring rounded-sm font-body text-xs font-medium tracking-[0.02em] text-platinum-gray transition-colors duration-instant hover:text-lime motion-reduce:transition-none"
                   >
                     {label}
                   </a>

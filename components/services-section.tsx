@@ -29,7 +29,7 @@ export function ServicesSection() {
           {services.map((service, index) => (
             <SpotlightCard
               key={service.id}
-              className="flex flex-col gap-3 rounded-2xl border border-alabaster/10 border-l-alabaster/25 bg-alabaster/5 p-6"
+              className="flex h-full flex-col gap-3 rounded-2xl border border-alabaster/10 border-l-alabaster/25 bg-alabaster/5 p-6 transition-[transform,border-color] duration-fast ease-out-quad hover:-translate-y-0.5 hover:border-alabaster/25 motion-reduce:transition-none"
             >
               <h3 className="flex items-baseline gap-3 font-heading text-lg font-black text-alabaster">
                 <span>{`${index + 1}.`}</span>

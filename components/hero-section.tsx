@@ -44,7 +44,10 @@ export function HeroSection() {
             </a>
             <a
               href="#servicos"
-              className="font-body text-sm font-medium text-lime"
+              // Underline wipes in from the left rather than appearing at full
+              // width: a 0%-to-100% background-size is the only way to animate
+              // an underline, since text-decoration cannot be transitioned.
+              className="focus-ring rounded-sm bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat pb-1 font-body text-sm font-medium text-lime transition-[background-size] duration-fast ease-out-quad hover:bg-[length:100%_1px] motion-reduce:transition-none"
             >
               Ver serviços
             </a>

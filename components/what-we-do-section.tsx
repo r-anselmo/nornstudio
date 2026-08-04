@@ -34,7 +34,7 @@ export function WhatWeDoSection() {
         <SectionEyebrow>O que estamos fazendo</SectionEyebrow>
 
         <SpotlightGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 md:col-span-2">
+          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 md:col-span-2 transition-[transform,border-color] duration-fast ease-out-quad hover:-translate-y-0.5 hover:border-alabaster/25 motion-reduce:transition-none">
             <div className="flex items-start justify-between">
               <Quote className="h-6 w-6 text-lime" aria-hidden="true" />
               <span className="font-body text-xs text-platinum-gray">
@@ -54,7 +54,7 @@ export function WhatWeDoSection() {
             </p>
           </SpotlightCard>
 
-          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6">
+          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 transition-[transform,border-color] duration-fast ease-out-quad hover:-translate-y-0.5 hover:border-alabaster/25 motion-reduce:transition-none">
             <div className="flex justify-end">
               <span className="font-body text-xs text-platinum-gray">
                 Habilidades
@@ -64,7 +64,7 @@ export function WhatWeDoSection() {
               {skills.map(({ label, icon: Icon }) => (
                 <div
                   key={label}
-                  className="flex items-center gap-2 rounded-xl bg-alabaster/10 px-3 py-3"
+                  className="flex items-center gap-2 rounded-xl bg-alabaster/10 px-3 py-3 transition-colors duration-instant hover:bg-alabaster/20 motion-reduce:transition-none"
                 >
                   <Icon
                     className="h-4 w-4 shrink-0 text-alabaster"
@@ -78,7 +78,7 @@ export function WhatWeDoSection() {
             </div>
           </SpotlightCard>
 
-          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6">
+          <SpotlightCard className="flex flex-col gap-4 rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 transition-[transform,border-color] duration-fast ease-out-quad hover:-translate-y-0.5 hover:border-alabaster/25 motion-reduce:transition-none">
             <div className="flex justify-end">
               <span className="font-body text-xs text-platinum-gray">
                 Atualmente construindo em
@@ -91,7 +91,7 @@ export function WhatWeDoSection() {
               {buildingTags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-alabaster/10 px-3 py-1 font-body text-sm text-alabaster"
+                  className="rounded-full bg-alabaster/10 px-3 py-1 font-body text-sm text-alabaster transition-colors duration-instant hover:bg-alabaster/20 motion-reduce:transition-none"
                 >
                   {tag}
                 </span>
