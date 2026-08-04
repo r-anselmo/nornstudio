@@ -14,4 +14,5 @@ export const footerLinks: FooterLink[] = [
   { href: '#contato', label: 'CONTATO' },
 ]
 
-export const footerSignature = 'NORNGROWTHDESIGN · SINCE 2026'
+/** Used by the footer and by the manifesto card in WhatWeDo. */
+export const brandSignature = 'NORNGROWTHDESIGN · SINCE 2026'

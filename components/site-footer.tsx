@@ -1,4 +1,4 @@
-import { footerLinks, footerSignature, footerTagline } from '@/lib/footer'
+import { brandSignature, footerLinks, footerTagline } from '@/lib/footer'
 import { NornBadge } from '@/components/ui/norn-badge'
 
 export function SiteFooter() {
@@ -40,7 +40,7 @@ export function SiteFooter() {
 
         <div className="flex flex-col gap-2 font-body text-xs font-medium tracking-[0.02em] md:flex-row md:items-center md:justify-between">
           <p className="text-alabaster">© {year} NORN</p>
-          <p className="text-platinum-gray">{footerSignature}</p>
+          <p className="text-platinum-gray">{brandSignature}</p>
         </div>
       </div>
     </footer>

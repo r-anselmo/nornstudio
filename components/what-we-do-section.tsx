@@ -12,6 +12,7 @@ import { SpotlightCard, SpotlightGroup } from '@/components/ui/spotlight-card'
 import { SectionEyebrow } from '@/components/ui/section-eyebrow'
 import { Reveal } from '@/components/ui/reveal'
 import { STAGGER_MS } from '@/lib/motion'
+import { brandSignature } from '@/lib/footer'
 
 type Skill = {
   label: string
@@ -55,7 +56,7 @@ export function WhatWeDoSection() {
                 resultado.
               </p>
               <p className="font-body text-xs font-medium tracking-[0.02em] text-platinum-gray">
-                NORNGROWTHDESIGN · SINCE 2026
+                {brandSignature}
               </p>
             </SpotlightCard>
 

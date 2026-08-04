@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import { SiteFooter } from './site-footer'
-import { footerLinks, footerSignature, footerTagline } from '@/lib/footer'
+import { brandSignature, footerLinks, footerTagline } from '@/lib/footer'
 
 describe('SiteFooter', () => {
   it('is the page contentinfo landmark', () => {
@@ -34,7 +34,7 @@ describe('SiteFooter', () => {
 
     const year = new Date().getFullYear()
     expect(screen.getByText(`© ${year} NORN`)).toBeInTheDocument()
-    expect(screen.getByText(footerSignature)).toBeInTheDocument()
+    expect(screen.getByText(brandSignature)).toBeInTheDocument()
   })
 
   it('sits on the dark surface, not the lime one', () => {
