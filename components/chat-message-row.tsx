@@ -7,7 +7,10 @@ import type { ChatSender } from '@/lib/chat-flow-script'
 import { ENTER_ROOT_MARGIN, useChatConversation } from '@/components/chat-conversation'
 import { NornBadge } from '@/components/ui/norn-badge'
 
-const dotDelays = ['0ms', '150ms', '300ms']
+// Offsets tuned to the 1400ms keyframe in globals.css: spread far enough apart
+// that the bounce visibly travels along the row rather than the three dots
+// moving as one.
+const dotDelays = ['0ms', '160ms', '320ms']
 
 export function ChatTypingDots() {
   return (
@@ -18,7 +21,7 @@ export function ChatTypingDots() {
           // Inline style, not `delay-*`: Tailwind core's delay utilities shadow
           // tw-animate-css and emit transition-delay, not animation-delay.
           style={{ animationDelay: delay }}
-          className={`h-1.5 w-1.5 rounded-full motion-reduce:animate-none animate-pulse ${
+          className={`h-1.5 w-1.5 rounded-full motion-reduce:animate-none animate-chat-typing ${
             index === dotDelays.length - 1 ? 'bg-lime' : 'bg-platinum-gray'
           }`}
         />
