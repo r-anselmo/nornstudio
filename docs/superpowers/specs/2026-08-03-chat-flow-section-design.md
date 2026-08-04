@@ -124,6 +124,46 @@ a small viewport.
   section to use them; `WhatWeDoSection` kept its older bordered pill for a
   while, and every section now shares `components/ui/section-eyebrow.tsx`.
 
+**The phase rail (added later)**
+
+The section read as unfinished next to the rest of the page, but the cause was
+not missing glow — it was structural. The container is `max-w-5xl` (1024px) and
+the thread is `max-w-2xl` (672px) centred, so wide screens leave ~176px of dead
+gutter each side under a left-aligned header. A background wash would have lit
+those pixels without composing them.
+
+`ChatPhaseRail` occupies the left gutter with a vertical progress bar, one equal
+segment per phase, driven by the reveal cursor the section already owns. It
+carries only the numbers `01`–`04`; the phase names stay in the thread's `<h3>`
+dividers, so nothing is duplicated and the rail is `aria-hidden`.
+
+Decisions that are load-bearing:
+
+- **`lg`, not `md`.** At a 768px viewport the container is 672px and the thread
+  is 672px — the gutter is exactly zero and the rail would sit on top of the
+  thread. `lg` gives 128px, ≥1120px gives 176px.
+- **Progress is normalised per phase**, in `lib/chat-rail-progress.ts`. The
+  phases hold 4, 3, 1 and 4 messages across four *equal* segments, so a raw
+  `revealedCount / total` puts the bar at 33% when phase 01 completes while its
+  node sits at 25%. The bar would cross the nodes at the wrong moment.
+- **Unarmed means complete, not empty.** With reduced motion, without
+  `IntersectionObserver`, or in the prerendered HTML, every message is already
+  visible — so the rail renders full and every node reached. Gating on
+  `revealedCount` alone would grey out three phases forever in the static export.
+- **The fill is remounted on `key={armed ? 'armed' : 'idle'}`.** Arming flips the
+  cursor from "all visible" to zero in a separate task from hydration, and
+  without the remount the browser animates a 700ms drain from full to empty on
+  page load.
+- **Phase counts arrive as props.** `lib/chat-flow-script.ts` is in zero client
+  bundles — the section is a server component and the other consumers use
+  `import type`. Importing `chatPhases` inside the client rail would ship all
+  twelve messages of copy to the browser to duplicate the exported HTML. There
+  is a verification step that greps the built chunks for chat copy.
+
+`ChatPhaseDivider` gives the same progress cue at every width: the phase label
+dims to `text-platinum-gray` until its phase is reached. That is what mobile
+gets, since the gutter the rail fills does not exist there.
+
 **Responsive**
 - Chat is a `max-w-2xl` column centred inside the `max-w-5xl` container;
   bubbles cap at `max-w-[80%]`. A chat reads better narrow, so desktop gains

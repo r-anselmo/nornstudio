@@ -24,6 +24,12 @@ export type ChatRevealPhase = 'initial' | 'hidden' | 'typing' | 'shown'
 
 type ChatConversationValue = {
   armed: boolean
+  /**
+   * How many messages have resolved. Read by the phase rail to draw progress —
+   * note it excludes the message currently typing, so the rail trails the dots
+   * by one, which is what makes it read as "settled so far".
+   */
+  revealedCount: number
   phaseFor: (index: number) => ChatRevealPhase
   markEntered: (index: number) => void
 }
@@ -113,7 +119,9 @@ export function ChatConversation({
   )
 
   return (
-    <ChatConversationContext.Provider value={{ armed, phaseFor, markEntered }}>
+    <ChatConversationContext.Provider
+      value={{ armed, revealedCount, phaseFor, markEntered }}
+    >
       {children}
     </ChatConversationContext.Provider>
   )
