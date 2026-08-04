@@ -5,6 +5,7 @@ import { Reveal } from '@/components/ui/reveal'
 import { STAGGER_MS } from '@/lib/motion'
 import { ContactTrigger } from '@/components/contact-trigger'
 import { ctaLabel } from '@/lib/cta'
+import { heroHeadline, heroTagline } from '@/lib/hero'
 
 export function HeroSection() {
   return (
@@ -23,22 +24,28 @@ export function HeroSection() {
         <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
           <Reveal>
             <h1 className="font-heading text-4xl font-black leading-[1.05] tracking-[0.02em] text-alabaster md:text-6xl lg:text-7xl">
-              <span className="block">TODO MUNDO</span>
-              <span className="block">FALA EM</span>
-              <span className="block">ESTRATÉGIA.</span>
-              <span className="mt-2 block rounded-xl bg-lime px-4 py-1 text-carbon-black">
-                A GENTE
-              </span>
-              <span className="mt-2 block rounded-xl bg-lime px-4 py-1 text-carbon-black">
-                EXECUTA.
-              </span>
+              {heroHeadline.map(({ text, emphasis }) =>
+                emphasis ? (
+                  // Full class literals per branch: Tailwind's scanner cannot
+                  // resolve names assembled at runtime.
+                  <span
+                    key={text}
+                    className="mt-2 block rounded-xl bg-lime px-4 py-1 text-carbon-black"
+                  >
+                    {text}
+                  </span>
+                ) : (
+                  <span key={text} className="block">
+                    {text}
+                  </span>
+                )
+              )}
             </h1>
           </Reveal>
 
           <Reveal delay={STAGGER_MS}>
             <p className="max-w-sm font-body text-base text-platinum-gray md:text-lg">
-              Do experimento ao resultado: a gente acelera suas iniciativas
-              digitais por dentro.
+              {heroTagline}
             </p>
           </Reveal>
 
