@@ -55,7 +55,7 @@ describe('HeroSection', () => {
   it('renders the logo mark', () => {
     renderHero()
 
-    expect(screen.getAllByTestId('norn-mark').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByTestId('norn-mark')).toBeInTheDocument()
   })
 
   it('renders the bottom info row', () => {

@@ -22,13 +22,18 @@ import { isValid, validateContact } from '@/lib/validate-contact'
 import type { ContactErrors, ContactValues } from '@/lib/validate-contact'
 import { NornBadge } from '@/components/ui/norn-badge'
 import { NornMark } from '@/components/ui/norn-mark'
+import { STAGGER_MS } from '@/lib/motion'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
 const EMPTY: ContactValues = { name: '', email: '', message: '' }
 
+// No `contact-field` here: the Field wrapper already carries it and
+// --field-delay inherits down. Repeating it also broke the border easing —
+// `.contact-field` is unlayered, so its `transition` shorthand beat the layered
+// `transition-colors duration-instant` and snapped focus:border-lime/60.
 const fieldClass =
-  'contact-field w-full rounded-2xl border border-alabaster/15 bg-alabaster/5 px-4 py-3 font-body text-sm text-alabaster placeholder:text-platinum-gray/50 transition-colors duration-instant focus-ring focus:border-lime/60 motion-reduce:transition-none'
+  'w-full rounded-2xl border border-alabaster/15 bg-alabaster/5 px-4 py-3 font-body text-sm text-alabaster placeholder:text-platinum-gray/50 transition-colors duration-instant focus-ring focus:border-lime/60 motion-reduce:transition-none'
 
 /**
  * The shell: chrome only, no state. Everything the visitor types lives in
@@ -193,7 +198,7 @@ function ContactDialogBody() {
           id={emailId}
           label={contactEmailQuestion}
           error={errors.email}
-          delayMs={90}
+          delayMs={STAGGER_MS}
         >
           {(fieldProps) => (
             <input
@@ -212,7 +217,7 @@ function ContactDialogBody() {
           id={messageId}
           label={contactMessageQuestion}
           error={errors.message}
-          delayMs={180}
+          delayMs={STAGGER_MS * 2}
         >
           {(fieldProps) => (
             <textarea

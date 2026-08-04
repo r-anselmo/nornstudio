@@ -28,7 +28,7 @@ export function ChatPhaseDivider({
       <span aria-hidden="true" className="h-px flex-1 bg-alabaster/15" />
       <h3
         // Full literals per branch: Tailwind cannot scan a templated name.
-        className={`font-body text-xs font-medium tracking-[0.02em] transition-colors duration-500 motion-reduce:transition-none ${
+        className={`font-body text-xs font-medium tracking-[0.02em] transition-colors duration-slow motion-reduce:transition-none ${
           reached ? 'text-lime' : 'text-platinum-gray'
         }`}
       >

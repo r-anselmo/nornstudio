@@ -108,8 +108,8 @@ export function ChatMessageRow({
       : phase === 'hidden'
         ? 'opacity-0'
         : isNorn
-          ? 'animate-in fade-in slide-in-from-right-4 duration-500 fill-mode-both'
-          : 'animate-in fade-in slide-in-from-left-4 duration-500 fill-mode-both'
+          ? 'animate-in fade-in slide-in-from-right-4 duration-slow fill-mode-both'
+          : 'animate-in fade-in slide-in-from-left-4 duration-slow fill-mode-both'
 
   return (
     <div

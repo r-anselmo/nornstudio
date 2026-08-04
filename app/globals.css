@@ -132,8 +132,10 @@
     scroll-behavior: smooth;
   }
   /* The anchors land flush against the viewport top otherwise, with the
-     section eyebrow touching the edge. */
-  [id] {
+     section eyebrow touching the edge. Scoped to sections because they are the
+     only anchor targets — a bare [id] also caught every useId-generated form
+     field and every internal id Base UI mints. */
+  section[id] {
     scroll-margin-top: 2rem;
   }
 }
@@ -201,7 +203,9 @@
 /* Motion tokens -------------------------------------------------------------
    Durations and easings used to be scattered literals — duration-500,
    duration-700, TYPING_MS, takeoverDuration — with `ease-out` appearing
-   exactly once and everything else falling back to the browser default.
+   exactly once and everything else falling back to the browser default. The
+   chat thread's 500s and 700s now read from this scale too, so the numbers
+   exist in one place.
 
    Easings go in @theme because Tailwind's --ease-* namespace generates
    utilities from them. Durations cannot: Tailwind 4.3 has no --duration-*

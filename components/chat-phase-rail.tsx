@@ -10,12 +10,12 @@ function RailNode({ step, reached }: { step: string; reached: boolean }) {
   return (
     <div className="flex items-center gap-3" data-testid="rail-node" data-state={reached ? 'complete' : 'pending'}>
       <span
-        className={`h-2 w-2 shrink-0 rounded-full transition-colors duration-500 motion-reduce:transition-none ${
+        className={`h-2 w-2 shrink-0 rounded-full transition-colors duration-slow motion-reduce:transition-none ${
           reached ? 'bg-lime' : 'bg-alabaster/25'
         }`}
       />
       <span
-        className={`font-body text-xs font-medium tracking-[0.02em] transition-colors duration-500 motion-reduce:transition-none ${
+        className={`font-body text-xs font-medium tracking-[0.02em] transition-colors duration-slow motion-reduce:transition-none ${
           reached ? 'text-lime' : 'text-platinum-gray/50'
         }`}
       >
@@ -68,7 +68,7 @@ export function ChatPhaseRail({
             key={armed ? 'armed' : 'idle'}
             data-testid="rail-fill"
             style={{ height: `${fill * 100}%` }}
-            className="absolute left-1 top-1 w-px -translate-x-1/2 rounded-full bg-lime transition-[height] duration-700 ease-out motion-reduce:transition-none"
+            className="absolute left-1 top-1 w-px -translate-x-1/2 rounded-full bg-lime transition-[height] duration-deliberate ease-out motion-reduce:transition-none"
           />
           {phases.map((phase, index) => (
             <RailNode
