@@ -1,15 +1,10 @@
 import { ArrowRight } from 'lucide-react'
-import {
-  ctaEyebrow,
-  ctaHeading,
-  ctaHref,
-  ctaLabel,
-  ctaSubheading,
-} from '@/lib/cta'
+import { ctaEyebrow, ctaHeading, ctaLabel, ctaSubheading } from '@/lib/cta'
 import { SectionEyebrow } from '@/components/ui/section-eyebrow'
 import { NornMark } from '@/components/ui/norn-mark'
 import { Reveal } from '@/components/ui/reveal'
 import { STAGGER_MS } from '@/lib/motion'
+import { ContactTrigger } from '@/components/contact-trigger'
 
 export function CtaSection() {
   return (
@@ -39,13 +34,13 @@ export function CtaSection() {
         </Reveal>
 
         <Reveal delay={STAGGER_MS * 2} className="w-full md:w-auto">
-          <a
-            href={ctaHref}
-            className="mt-2 flex w-full items-center justify-center gap-3 rounded-2xl bg-carbon-black px-8 py-4 font-heading text-lg font-black text-alabaster transition-colors hover:bg-carbon-black/90 md:w-auto"
-          >
+          <ContactTrigger className="focus-ring group mt-2 flex w-full items-center justify-center gap-3 rounded-2xl bg-carbon-black px-8 py-4 font-heading text-lg font-black text-alabaster transition-colors duration-instant hover:bg-carbon-black/90 md:w-auto">
             {ctaLabel}
-            <ArrowRight className="h-5 w-5 shrink-0 text-lime" aria-hidden="true" />
-          </a>
+            <ArrowRight
+              className="h-5 w-5 shrink-0 text-lime transition-transform duration-fast group-hover:translate-x-0.5 motion-reduce:transition-none"
+              aria-hidden="true"
+            />
+          </ContactTrigger>
         </Reveal>
       </div>
     </section>

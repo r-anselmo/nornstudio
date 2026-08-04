@@ -3,6 +3,8 @@ import { LiveClock } from '@/components/live-clock'
 import { NornBadge } from '@/components/ui/norn-badge'
 import { Reveal } from '@/components/ui/reveal'
 import { STAGGER_MS } from '@/lib/motion'
+import { ContactTrigger } from '@/components/contact-trigger'
+import { ctaLabel } from '@/lib/cta'
 
 export function HeroSection() {
   return (
@@ -42,13 +44,15 @@ export function HeroSection() {
 
           <Reveal delay={STAGGER_MS * 2}>
             <div className="flex flex-wrap items-center justify-center gap-4">
-              <a
-                href="#contato"
-                className="flex items-center gap-2 rounded-full border border-lime px-6 py-3 font-body text-sm font-medium text-lime"
-              >
-                Iniciar Projeto
-                <span aria-hidden="true">→</span>
-              </a>
+              <ContactTrigger className="focus-ring group flex items-center gap-2 rounded-full border border-lime px-6 py-3 font-body text-sm font-medium text-lime transition-colors duration-instant hover:bg-lime hover:text-carbon-black motion-reduce:transition-none">
+                {ctaLabel}
+                <span
+                  aria-hidden="true"
+                  className="transition-transform duration-fast group-hover:translate-x-0.5 motion-reduce:transition-none"
+                >
+                  →
+                </span>
+              </ContactTrigger>
               <a
                 href="#servicos"
                 // Underline wipes in from the left rather than appearing at full

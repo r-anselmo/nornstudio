@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { cabinetGrotesk, generalSans } from './fonts'
 import { MOTION_GATE_CLASS } from '@/lib/motion'
+import { ContactDialogProvider } from '@/components/contact-dialog-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -36,7 +37,9 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: motionGateScript }} />
       </head>
-      <body className="font-body antialiased">{children}</body>
+      <body className="font-body antialiased">
+        <ContactDialogProvider>{children}</ContactDialogProvider>
+      </body>
     </html>
   )
 }

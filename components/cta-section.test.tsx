@@ -1,17 +1,20 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { CtaSection } from './cta-section'
-import {
-  ctaEyebrow,
-  ctaHeading,
-  ctaHref,
-  ctaLabel,
-  ctaSubheading,
-} from '@/lib/cta'
+import { ContactDialogProvider } from './contact-dialog-provider'
+import { ctaEyebrow, ctaHeading, ctaLabel, ctaSubheading } from '@/lib/cta'
+
+function renderCta() {
+  return render(
+    <ContactDialogProvider>
+      <CtaSection />
+    </ContactDialogProvider>
+  )
+}
 
 describe('CtaSection', () => {
   it('renders the eyebrow, heading and supporting copy', () => {
-    render(<CtaSection />)
+    renderCta()
 
     expect(screen.getByText(ctaEyebrow)).toBeInTheDocument()
     expect(
@@ -20,15 +23,19 @@ describe('CtaSection', () => {
     expect(screen.getByText(ctaSubheading)).toBeInTheDocument()
   })
 
-  it('renders the call to action as a link', () => {
-    render(<CtaSection />)
+  it('opens the contact dialog rather than navigating', () => {
+    renderCta()
 
-    const link = screen.getByRole('link', { name: new RegExp(ctaLabel) })
-    expect(link).toHaveAttribute('href', ctaHref)
+    // It opens a dialog, so it is a button. A link here would promise a
+    // destination that does not exist.
+    expect(
+      screen.getByRole('button', { name: new RegExp(ctaLabel) })
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: new RegExp(ctaLabel) })).toBeNull()
   })
 
   it('inverts the palette: lime surface, carbon type', () => {
-    const { container } = render(<CtaSection />)
+    const { container } = renderCta()
 
     const section = container.querySelector('section')
     expect(section?.className).toContain('bg-lime')
@@ -40,30 +47,31 @@ describe('CtaSection', () => {
   })
 
   it('answers the hero link that points at #contato', () => {
-    const { container } = render(<CtaSection />)
+    const { container } = renderCta()
 
     expect(container.querySelector('section')).toHaveAttribute('id', 'contato')
   })
 
   it('hides the decorative mark from assistive technology', () => {
-    const { container } = render(<CtaSection />)
+    const { container } = renderCta()
 
-    const mark = container.querySelector('svg')
+    const mark = container.querySelector('section svg')
     expect(mark).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('leaves the mark upright', () => {
-    const { container } = render(<CtaSection />)
+    const { container } = renderCta()
 
     // `className` on an SVG element is an SVGAnimatedString, not a string.
-    const classes = container.querySelector('svg')?.getAttribute('class') ?? ''
+    const classes =
+      container.querySelector('section svg')?.getAttribute('class') ?? ''
 
     // A tilted logo reads as a broken image, not as decoration.
     expect(classes).not.toMatch(/rotate|skew|-scale/)
   })
 
   it('clips the mark to the section', () => {
-    const { container } = render(<CtaSection />)
+    const { container } = renderCta()
 
     expect(container.querySelector('section')?.className).toContain(
       'overflow-hidden'
