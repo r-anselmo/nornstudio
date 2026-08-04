@@ -111,6 +111,10 @@ export function ChatMessageRow({
   return (
     <div
       ref={rowRef}
+      // A styling hook distinct from the test id: globals.css keys the
+      // before-first-paint hidden state off this, and stylesheets should not
+      // depend on test selectors.
+      data-chat-row=""
       data-testid="chat-row"
       data-phase={phase}
       className={`flex items-end gap-3 ${isNorn ? 'flex-row-reverse' : ''} ${revealClass}`}

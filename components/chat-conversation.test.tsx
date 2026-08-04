@@ -8,6 +8,7 @@ import {
 } from './chat-conversation'
 import { ChatMessageRow } from './chat-message-row'
 import type { ChatSender } from '@/lib/chat-flow-script'
+import { MOTION_GATE_CLASS } from '@/lib/motion'
 
 type IntersectionCallback = (
   entries: Array<{
@@ -104,12 +105,16 @@ describe('ChatConversation', () => {
     observers = []
     vi.useFakeTimers()
     vi.stubGlobal('IntersectionObserver', IntersectionObserverStub)
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }))
+    // The gate replaces the old matchMedia + IntersectionObserver checks:
+    // the head script resolves both before first paint, and the conversation
+    // reads only its result.
+    document.documentElement.classList.add(MOTION_GATE_CLASS)
   })
 
   afterEach(() => {
     vi.useRealTimers()
     vi.unstubAllGlobals()
+    document.documentElement.classList.remove(MOTION_GATE_CLASS)
   })
 
   function arm() {
@@ -263,8 +268,8 @@ describe('ChatConversation', () => {
     expect(phases()).toEqual(['shown', 'shown'])
   })
 
-  it('leaves everything visible when the user prefers reduced motion', () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }))
+  it('leaves everything visible when the motion gate is absent', () => {
+    document.documentElement.classList.remove(MOTION_GATE_CLASS)
 
     renderConversation(['client', 'norn'])
     arm()
@@ -273,12 +278,11 @@ describe('ChatConversation', () => {
     expect(observers).toHaveLength(0)
   })
 
-  it('leaves everything visible without IntersectionObserver', () => {
-    vi.stubGlobal('IntersectionObserver', undefined)
-
+  it('marks rows so the gate stylesheet can hide them before first paint', () => {
     renderConversation(['client', 'norn'])
-    arm()
 
-    expect(phases()).toEqual(['initial', 'initial'])
+    for (const row of screen.getAllByTestId('chat-row')) {
+      expect(row).toHaveAttribute('data-chat-row')
+    }
   })
 })
