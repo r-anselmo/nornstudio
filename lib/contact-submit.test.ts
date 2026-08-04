@@ -10,17 +10,22 @@ const submission = {
 }
 
 function stubFetch(response: { ok: boolean } | Error) {
-  const fetchMock = vi.fn(() =>
-    response instanceof Error
-      ? Promise.reject(response)
-      : Promise.resolve(response as Response)
+  // Typed with fetch's real signature: a zero-parameter vi.fn() makes
+  // mock.calls an array of empty tuples, so reading calls[0][1] below would
+  // not typecheck even though it works at runtime.
+  const fetchMock = vi.fn(
+    (_input: RequestInfo | URL, _init?: RequestInit) =>
+      response instanceof Error
+        ? Promise.reject(response)
+        : Promise.resolve(response as Response)
   )
   vi.stubGlobal('fetch', fetchMock)
   return fetchMock
 }
 
 function bodyOf(fetchMock: ReturnType<typeof stubFetch>) {
-  return JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string)
+  const [, init] = fetchMock.mock.calls[0]
+  return JSON.parse(init?.body as string)
 }
 
 afterEach(() => {

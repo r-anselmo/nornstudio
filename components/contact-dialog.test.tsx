@@ -131,6 +131,19 @@ describe('ContactDialog', () => {
     expect(honeypot).toHaveAttribute('aria-hidden', 'true')
   })
 
+  it('announces the confirmation to assistive technology', async () => {
+    const user = userEvent.setup()
+    renderDialog()
+
+    await openAndFill(user)
+    await user.click(screen.getByRole('button', { name: contactSubmitLabel }))
+
+    // The submit button that held focus is removed on success, so without a
+    // live region nothing tells a screen reader the message actually sent.
+    const status = await screen.findByRole('status')
+    expect(status).toHaveTextContent(contactSuccessTitle)
+  })
+
   it('starts clean the next time it opens', async () => {
     const user = userEvent.setup()
     renderDialog()

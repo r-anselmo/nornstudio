@@ -107,7 +107,12 @@ function ContactDialogBody() {
 
   if (status === 'success') {
     return (
-      <div className="flex flex-col items-center gap-3 py-8 text-center">
+      <div
+        // The submit button that held focus is gone, and without a live
+        // region nothing tells a screen reader the message actually sent.
+        role="status"
+        className="flex flex-col items-center gap-3 py-8 text-center"
+      >
         <NornMark className="w-12 animate-in fade-in zoom-in-95 text-lime duration-slow ease-spring" />
         <p className="font-heading text-xl font-black text-alabaster">
           {contactSuccessTitle}
