@@ -1,8 +1,16 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import type { ReactNode } from 'react'
 import { ContactDialog } from '@/components/contact-dialog'
+import { MOTION_HYDRATED_FLAG } from '@/lib/motion'
 
 type ContactDialogValue = {
   open: () => void
@@ -27,11 +35,20 @@ export function useContactDialog(): ContactDialogValue {
  *
  * Wraps `{children}` in the layout, which keeps the page tree server-rendered:
  * a client provider can have server children.
+ *
+ * That position — the outermost client component on every page — is also why it
+ * carries the hydration flag the motion gate waits on.
  */
 export function ContactDialogProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
   const open = useCallback(() => setIsOpen(true), [])
   const value = useMemo(() => ({ open }), [open])
+
+  useEffect(() => {
+    // Tells the gate script in app/layout.tsx that the bundle is alive, so it
+    // does not withdraw the motion gate and force everything visible.
+    ;(window as unknown as Record<string, boolean>)[MOTION_HYDRATED_FLAG] = true
+  }, [])
 
   return (
     <ContactDialogContext.Provider value={value}>

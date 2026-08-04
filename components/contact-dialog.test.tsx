@@ -11,6 +11,7 @@ import {
   contactSubmitLabel,
   contactSuccessTitle,
 } from '@/lib/contact'
+import { MOTION_HYDRATED_FLAG } from '@/lib/motion'
 
 const { submitMock } = vi.hoisted(() => ({
   submitMock: vi.fn(() => Promise.resolve({ ok: true })),
@@ -45,6 +46,22 @@ async function openAndFill(user: ReturnType<typeof userEvent.setup>) {
     'A conversão do onboarding caiu 30%.'
   )
 }
+
+describe('ContactDialogProvider', () => {
+  it('reports hydration to the motion gate', () => {
+    expect(
+      (window as unknown as Record<string, boolean>)[MOTION_HYDRATED_FLAG]
+    ).toBeUndefined()
+
+    renderDialog()
+
+    // The gate script withdraws the motion class unless this lands, so losing
+    // it would silently un-hide every reveal on the site eight seconds in.
+    expect(
+      (window as unknown as Record<string, boolean>)[MOTION_HYDRATED_FLAG]
+    ).toBe(true)
+  })
+})
 
 describe('ContactDialog', () => {
   it('stays closed until the trigger is used', () => {
