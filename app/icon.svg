@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Norn">
+  <!--
+    The brand lockup as a favicon: the same lime tile and carbon mark the site
+    uses for NornBadge, so the tab matches the header rather than being a
+    second, lonelier version of the logo.
+
+    The tile is not decoration. The mark alone is a single colour, so it would
+    vanish into whichever browser chrome matched it; the lime square carries its
+    own contrast and reads on light and dark tab bars alike.
+
+    Geometry mirrors NornBadge: a 20px mark in a 36px tile is 0.556, hence the
+    0.785 scale of the mark's own 725-unit box, and rounded-lg on that tile is
+    10/36, hence the 284 radius here. The translate re-centres the glyph, whose
+    own origin sits at (176, 189) rather than at zero.
+  -->
+  <rect width="1024" height="1024" rx="284" fill="#C6F432"/>
+  <g transform="translate(89.7 79.1) scale(0.785)">
+    <path fill="#1D1E18" d="M819.999 194C864.182 194 899.999 229.817 899.999 274V834C899.999 878.183 864.182 914 819.999 914H780.186C769.131 914 758.6 911.757 749.022 907.702C736.302 904.095 724.289 897.158 714.291 886.886L206.737 365.403C175.921 333.741 175.921 282.407 206.737 250.745L236.148 220.526C266.965 188.865 316.928 188.865 347.744 220.526L700.186 582.64V274C700.186 229.817 736.003 194 780.186 194H819.999ZM422.791 740.599C461.313 740.599 477.573 789.706 446.662 812.695L324.609 903.469C317.709 908.601 309.338 911.372 300.738 911.372H220C197.909 911.372 180 893.463 180 871.372V780.599C180 758.507 197.909 740.599 220 740.599H422.791Z"/>
+  </g>
+</svg>
