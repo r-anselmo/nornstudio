@@ -6,6 +6,7 @@ import { QuizGauge } from '@/components/quiz-gauge'
 import { QuizInsightCard } from '@/components/quiz-insight-card'
 import { QuizPhaseBars } from '@/components/quiz-phase-bars'
 import { QuizShareButton } from '@/components/quiz-share-button'
+import { Reveal } from '@/components/ui/reveal'
 import { SectionEyebrow } from '@/components/ui/section-eyebrow'
 import { SpotlightGroup } from '@/components/ui/spotlight-card'
 import {
@@ -22,6 +23,7 @@ import {
   quizTalkLabel,
 } from '@/lib/quiz'
 import { buildContactMessage } from '@/lib/quiz-message'
+import { STAGGER_MS } from '@/lib/motion'
 import { contextQuestion, goalQuestion } from '@/lib/quiz-questions'
 import { bandFor, highlights, phaseResults, totalScore } from '@/lib/quiz-score'
 
@@ -56,6 +58,10 @@ export function QuizResult({
     <div className="flex flex-col gap-12">
       <SectionEyebrow>{quizResultEyebrow}</SectionEyebrow>
 
+      {/* Stays static, not wrapped in Reveal: the effect above moves focus to
+          the heading on mount, and focusing an element still at opacity 0 is
+          worse than the missing entrance motion. Same tradeoff as the badge
+          row in site-footer.tsx. */}
       <div className="rounded-2xl border border-alabaster/10 bg-alabaster/5 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-8">
           <QuizGauge score={score} />
@@ -85,69 +91,77 @@ export function QuizResult({
         </p>
       </div>
 
-      <section className="flex flex-col gap-5">
-        <h2 className={sectionHeadingClass}>{quizProfileHeading}</h2>
-        <QuizPhaseBars results={results} />
-      </section>
+      <Reveal>
+        <section className="flex flex-col gap-5">
+          <h2 className={sectionHeadingClass}>{quizProfileHeading}</h2>
+          <QuizPhaseBars results={results} />
+        </section>
+      </Reveal>
 
-      <section className="flex flex-col gap-5">
-        <h2 className={sectionHeadingClass}>{quizStrengthsHeading}</h2>
-        {strengths.length > 0 ? (
-          <SpotlightGroup className="grid gap-4 md:grid-cols-2">
-            {strengths.map((result) => (
-              <QuizInsightCard key={result.name} result={result} tone="strength" />
-            ))}
-          </SpotlightGroup>
-        ) : (
-          <p className="font-body text-sm text-platinum-gray">
-            {quizNoStrengthsMessage}
+      <Reveal delay={STAGGER_MS}>
+        <section className="flex flex-col gap-5">
+          <h2 className={sectionHeadingClass}>{quizStrengthsHeading}</h2>
+          {strengths.length > 0 ? (
+            <SpotlightGroup className="grid gap-4 md:grid-cols-2">
+              {strengths.map((result) => (
+                <QuizInsightCard key={result.name} result={result} tone="strength" />
+              ))}
+            </SpotlightGroup>
+          ) : (
+            <p className="font-body text-sm text-platinum-gray">
+              {quizNoStrengthsMessage}
+            </p>
+          )}
+        </section>
+      </Reveal>
+
+      <Reveal delay={STAGGER_MS * 2}>
+        <section className="flex flex-col gap-5">
+          <h2 className={sectionHeadingClass}>{quizBottlenecksHeading}</h2>
+          {bottlenecks.length > 0 ? (
+            <SpotlightGroup className="grid gap-4">
+              {bottlenecks.map((result) => (
+                <QuizInsightCard
+                  key={result.name}
+                  result={result}
+                  tone="bottleneck"
+                />
+              ))}
+            </SpotlightGroup>
+          ) : (
+            <p className="font-body text-sm text-platinum-gray">
+              {quizNoBottlenecksMessage}
+            </p>
+          )}
+        </section>
+      </Reveal>
+
+      <Reveal delay={STAGGER_MS * 3}>
+        <div className="rounded-2xl border border-lime/40 bg-alabaster/5 p-6 md:p-8">
+          <p className="font-heading text-xl font-black leading-tight text-alabaster md:text-2xl">
+            {quizCtaTitle}
           </p>
-        )}
-      </section>
-
-      <section className="flex flex-col gap-5">
-        <h2 className={sectionHeadingClass}>{quizBottlenecksHeading}</h2>
-        {bottlenecks.length > 0 ? (
-          <SpotlightGroup className="grid gap-4">
-            {bottlenecks.map((result) => (
-              <QuizInsightCard
-                key={result.name}
-                result={result}
-                tone="bottleneck"
-              />
-            ))}
-          </SpotlightGroup>
-        ) : (
-          <p className="font-body text-sm text-platinum-gray">
-            {quizNoBottlenecksMessage}
+          <p className="mt-4 max-w-xl font-body text-sm text-platinum-gray">
+            {quizCtaBody}
           </p>
-        )}
-      </section>
-
-      <div className="rounded-2xl border border-lime/40 bg-alabaster/5 p-6 md:p-8">
-        <p className="font-heading text-xl font-black leading-tight text-alabaster md:text-2xl">
-          {quizCtaTitle}
-        </p>
-        <p className="mt-4 max-w-xl font-body text-sm text-platinum-gray">
-          {quizCtaBody}
-        </p>
-        <div className="mt-7 flex flex-wrap items-start gap-3">
-          <ContactTrigger
-            message={message}
-            className="focus-ring w-fit rounded-full bg-lime px-7 py-3.5 font-heading text-base font-black text-carbon-black transition-colors duration-instant hover:bg-lime/90 motion-reduce:transition-none"
-          >
-            {quizTalkLabel}
-          </ContactTrigger>
-          <QuizShareButton answers={answers} />
-          <button
-            type="button"
-            onClick={onRestart}
-            className="focus-ring w-fit rounded-full border border-alabaster/15 px-6 py-3.5 font-body text-sm font-medium text-alabaster transition-colors duration-instant hover:border-platinum-gray motion-reduce:transition-none"
-          >
-            {quizRestartLabel}
-          </button>
+          <div className="mt-7 flex flex-wrap items-start gap-3">
+            <ContactTrigger
+              message={message}
+              className="focus-ring w-fit rounded-full bg-lime px-7 py-3.5 font-heading text-base font-black text-carbon-black transition-colors duration-instant hover:bg-lime/90 motion-reduce:transition-none"
+            >
+              {quizTalkLabel}
+            </ContactTrigger>
+            <QuizShareButton answers={answers} />
+            <button
+              type="button"
+              onClick={onRestart}
+              className="focus-ring w-fit rounded-full border border-alabaster/15 px-6 py-3.5 font-body text-sm font-medium text-alabaster transition-colors duration-instant hover:border-platinum-gray motion-reduce:transition-none"
+            >
+              {quizRestartLabel}
+            </button>
+          </div>
         </div>
-      </div>
+      </Reveal>
     </div>
   )
 }

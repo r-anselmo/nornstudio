@@ -9,6 +9,13 @@ import { quizBackLabel } from '@/lib/quiz'
  * arrow press would advance the quiz. The semantics that look more correct
  * produce the wrong behaviour; `aria-pressed` is honest about what a click
  * does and Tab still walks them.
+ *
+ * Deliberately not wrapped in `Reveal`: this component stays mounted across
+ * all eleven questions, with only its props changing between them. `Reveal`
+ * fires once from its IntersectionObserver and then stays revealed, so it
+ * would animate question 1's entrance and never fire again — silently
+ * leaving questions 2 through 11 with less motion than question 1, which is
+ * worse than the uniform no-motion this component has today.
  */
 export function QuizQuestion({
   tag,

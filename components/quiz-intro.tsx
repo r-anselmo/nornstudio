@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { SectionEyebrow } from '@/components/ui/section-eyebrow'
+import { Reveal } from '@/components/ui/reveal'
 import {
   quizFinePrint,
   quizIntroBullets,
@@ -15,7 +16,9 @@ import {
 
 export function QuizIntro({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex max-w-2xl flex-col gap-6">
+    // A landing screen, not a scrolling section, so one Reveal for the whole
+    // block is enough — there is no sibling group to stagger it against.
+    <Reveal className="flex max-w-2xl flex-col gap-6">
       <SectionEyebrow>{quizIntroEyebrow}</SectionEyebrow>
 
       <h1 className="font-heading text-3xl font-black leading-tight text-alabaster md:text-5xl">
@@ -56,6 +59,6 @@ export function QuizIntro({ onStart }: { onStart: () => void }) {
       </button>
 
       <p className="font-body text-xs text-platinum-gray">{quizFinePrint}</p>
-    </div>
+    </Reveal>
   )
 }
