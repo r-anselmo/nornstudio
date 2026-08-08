@@ -61,6 +61,13 @@ function reducer(state: State, action: Action): State {
       return { ...initialState, answers: Array(QUESTION_COUNT).fill(null) }
 
     case 'restore':
+      // Trusts `action.answers` to already be exactly QUESTION_COUNT long and
+      // each value inside its own question's option range. `decodeAnswers`
+      // (lib/quiz-share.ts) guarantees that before the only call site below —
+      // `isComplete`, the render guard downstream, checks length and
+      // non-null, not range. A future call site that skipped that validation
+      // would not crash; it would render the header and footer with a blank
+      // `<main>`, `isComplete` silently rejecting the malformed answers.
       return {
         screen: 'result',
         index: QUESTION_COUNT - 1,
@@ -76,6 +83,14 @@ export function QuizExperience() {
     // In an effect rather than during render: the export is prerendered with
     // no query string, so reading `location` while rendering would be a
     // hydration mismatch.
+    //
+    // `useLayoutEffect` would remove the one-paint flash of the intro before
+    // a shared-link result swaps in, without reopening that mismatch — but it
+    // fires during the server render `next build` performs for the static
+    // export, where there is no layout to synchronize with, and React warns
+    // on every prerender that uses it. That warning would be permanent,
+    // repeating on every build, to erase a flash of roughly two frames that
+    // nobody perceives. Kept as `useEffect`.
     const shared = readSharedAnswers(window.location.search)
     if (shared) dispatch({ type: 'restore', answers: shared })
   }, [])
@@ -88,10 +103,7 @@ export function QuizExperience() {
   }
 
   const answered = state.answers.filter((answer) => answer !== null).length
-  const progress =
-    state.screen === 'result'
-      ? 100
-      : Math.round((answered / QUESTION_COUNT) * 100)
+  const progress = Math.round((answered / QUESTION_COUNT) * 100)
 
   const question = state.screen === 'question' ? questionAt(state.index) : null
 
