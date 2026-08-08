@@ -2047,12 +2047,7 @@ export function QuizResult({
   const band = bandFor(score)
   const { strengths, bottlenecks } = highlights(results)
 
-  const message = buildContactMessage({
-    answers,
-    score,
-    band: band.name,
-    bottlenecks,
-  })
+  const message = buildContactMessage(answers)
 
   return (
     <div className="flex flex-col gap-12">
