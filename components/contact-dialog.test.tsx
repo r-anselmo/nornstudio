@@ -235,3 +235,47 @@ describe('ContactDialog', () => {
     expect(await screen.findByLabelText(contactNameQuestion)).toHaveValue('')
   })
 })
+
+describe('ContactDialog prefill', () => {
+  function renderWithPrefill(message?: string) {
+    return render(
+      <ContactDialogProvider>
+        <ContactTrigger message={message}>Falar com a Norn</ContactTrigger>
+      </ContactDialogProvider>
+    )
+  }
+
+  it('starts the message field from the prefill the trigger carries', async () => {
+    const user = userEvent.setup()
+    renderWithPrefill('Tirei 55/100 no diagnóstico.')
+
+    await user.click(screen.getByRole('button', { name: 'Falar com a Norn' }))
+
+    expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue(
+      'Tirei 55/100 no diagnóstico.'
+    )
+  })
+
+  it('leaves the prefilled message editable', async () => {
+    const user = userEvent.setup()
+    renderWithPrefill('Tirei 55/100.')
+
+    await user.click(screen.getByRole('button', { name: 'Falar com a Norn' }))
+    await user.type(screen.getByLabelText(contactMessageQuestion), ' Quero ajuda.')
+
+    expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue(
+      'Tirei 55/100. Quero ajuda.'
+    )
+  })
+
+  it('still opens empty for a trigger that carries nothing', async () => {
+    const user = userEvent.setup()
+    renderWithPrefill()
+
+    await user.click(screen.getByRole('button', { name: 'Falar com a Norn' }))
+
+    // The hero and the CTA section pass no message; their behaviour must not
+    // change.
+    expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue('')
+  })
+})
