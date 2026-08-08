@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import { SiteFooter } from './site-footer'
 import { brandSignature, footerLinks, footerTagline } from '@/lib/footer'
+import { quizNavLabel } from '@/lib/quiz'
 
 describe('SiteFooter', () => {
   it('is the page contentinfo landmark', () => {
@@ -53,6 +54,16 @@ describe('SiteFooter', () => {
 
     expect(screen.getByRole('contentinfo').className).toContain(
       'bg-carbon-black'
+    )
+  })
+
+  it('offers the growth diagnostic', () => {
+    render(<SiteFooter />)
+
+    const nav = screen.getByRole('navigation', { name: /rodapé/i })
+    expect(within(nav).getByRole('link', { name: quizNavLabel })).toHaveAttribute(
+      'href',
+      '/quiz/'
     )
   })
 })
