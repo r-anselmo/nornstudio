@@ -4,6 +4,11 @@ import { quizGaugeLabel, quizScaleLabel } from '@/lib/quiz'
 import { scoreOpacity } from '@/lib/quiz-score'
 import { useArmed } from '@/lib/use-armed'
 
+// The stroke is centred on the path, so the ring's outer edge sits at
+// RADIUS + strokeWidth / 2. The svg below is a 150-unit viewBox centred at
+// (75, 75) with a strokeWidth of 12, so that edge must stay within 75 or the
+// stroke clips against the box — a ceiling of RADIUS <= 69. 64 leaves 5 units
+// of headroom.
 const RADIUS = 64
 
 /** Rounded so the dash offsets land on whole numbers. */
@@ -16,7 +21,12 @@ export const GAUGE_CIRCUMFERENCE = Math.round(2 * Math.PI * RADIUS)
  */
 export function QuizGauge({ score }: { score: number }) {
   const armed = useArmed()
-  const offset = armed ? GAUGE_CIRCUMFERENCE * (1 - score / 100) : GAUGE_CIRCUMFERENCE
+  // Rounded for the same reason as GAUGE_CIRCUMFERENCE: an un-rounded offset
+  // (e.g. 136.67999999999998 at score 66) lands verbatim in the prerendered
+  // HTML, and sub-pixel precision buys nothing on a 150-unit viewBox.
+  const offset = armed
+    ? Math.round(GAUGE_CIRCUMFERENCE * (1 - score / 100))
+    : GAUGE_CIRCUMFERENCE
 
   return (
     <div

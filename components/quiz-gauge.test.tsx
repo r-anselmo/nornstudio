@@ -19,6 +19,19 @@ describe('QuizGauge', () => {
     expect(screen.getByText('72')).toBeInTheDocument()
   })
 
+  it('starts with the ring empty, before useArmed flips on the next frame', () => {
+    render(<QuizGauge score={50} />)
+
+    // useArmed (lib/use-armed.ts) stays false until the frame after mount, so
+    // the very first paint must offset the ring by the full circumference —
+    // an empty ring — or the transition has no start state to run from and
+    // never visibly draws in.
+    expect(screen.getByTestId('quiz-gauge-fill')).toHaveAttribute(
+      'stroke-dashoffset',
+      String(GAUGE_CIRCUMFERENCE)
+    )
+  })
+
   it('draws the ring in proportion to the score', async () => {
     render(<QuizGauge score={50} />)
 
