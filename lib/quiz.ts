@@ -47,6 +47,16 @@ export function quizGaugeLabel(score: number): string {
   return `Sua nota de growth: ${score} de 100.`
 }
 
+/**
+ * The accessible name for one row in `quiz-phase-bars.tsx`. Sighted readers
+ * pair a phase's name with its score because they sit on the same row; this
+ * gives a screen reader the same pairing as one statement, same idea as
+ * `quizGaugeLabel` above for the ring.
+ */
+export function quizPhaseScoreLabel(name: string, score: number): string {
+  return `${name}: nota ${score} de 100.`
+}
+
 export function quizContextLine(stage: string, goal: string): string {
   return `Estágio: ${stage} · Meta: ${goal}`
 }
