@@ -278,4 +278,36 @@ describe('ContactDialog prefill', () => {
     // change.
     expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue('')
   })
+
+  it('does not leak one trigger’s prefill into the next trigger opened', async () => {
+    // ContactTrigger calls open({ message }) unconditionally, even when
+    // message is undefined, so the provider's stored prefill is overwritten
+    // on every open. That overwrite is load-bearing: without it, a visitor
+    // who opens the quiz's prefilled dialog, closes it, then opens the plain
+    // "Iniciar Projeto" trigger would find someone else's diagnosis still
+    // sitting in the message field.
+    const user = userEvent.setup()
+    render(
+      <ContactDialogProvider>
+        <ContactTrigger message="Tirei 55/100 no diagnóstico.">
+          Falar com a Norn
+        </ContactTrigger>
+        <ContactTrigger>Iniciar Projeto</ContactTrigger>
+      </ContactDialogProvider>
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Falar com a Norn' }))
+    expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue(
+      'Tirei 55/100 no diagnóstico.'
+    )
+
+    await user.keyboard('{Escape}')
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Iniciar Projeto' }))
+
+    expect(await screen.findByLabelText(contactMessageQuestion)).toHaveValue('')
+  })
 })
