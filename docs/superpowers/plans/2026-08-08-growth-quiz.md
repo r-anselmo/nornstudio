@@ -801,7 +801,7 @@ export function scoreOpacity(score: number): number {
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run lib/quiz-score.test.ts`
-Expected: PASS, 14 tests.
+Expected: PASS, 17 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -3067,10 +3067,19 @@ change is the suspect — check that the anchor links are still plain `<a>`.
 
 - [ ] **Step 2: Lint**
 
-Run: `npm run lint`
+Run: `npx eslint app components lib`
 Expected: no errors. The two rules most likely to fire here are
 `react/no-unescaped-entities` (a Portuguese string left in JSX) and
 `react-hooks/static-components` (a component declared inside another).
+
+**Not `npm run lint`.** That lints the whole working directory, which includes
+`ds-bundle/` — the generated design-system bundle, complete with a vendored
+copy of React. It is gitignored, but ESLint 9's flat config does not read
+`.gitignore`, so it gets linted anyway and reports 22 pre-existing
+`react-hooks/rules-of-hooks` errors from inside React's own reconciler. That
+number is the baseline on this branch and on `master`; it has nothing to do
+with the quiz. Linting the three source directories is the check that actually
+means something here.
 
 - [ ] **Step 3: Typecheck through the build**
 
