@@ -73,6 +73,11 @@ export function QuizResult({
           </div>
         </div>
         <p className="mt-8 font-body text-xs text-platinum-gray">
+          {/* Indexed with no fallback: `answers` is only ever complete and
+              in-range here — the reducer builds it one in-range click at a
+              time, and a shared link is range-validated by `decodeAnswers`
+              before it reaches this screen. Same precondition
+              `buildContactMessage` relies on in lib/quiz-message.ts. */}
           {quizContextLine(
             contextQuestion.options[answers[0]],
             goalQuestion.options[answers[1]]

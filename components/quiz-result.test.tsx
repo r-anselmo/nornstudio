@@ -3,17 +3,20 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QuizResult } from './quiz-result'
 import { ContactDialogProvider } from './contact-dialog-provider'
-import { contextQuestion, goalQuestion, phases } from '@/lib/quiz-questions'
+import { contextQuestion, goalQuestion } from '@/lib/quiz-questions'
 import { bandFor, highlights, phaseResults, totalScore } from '@/lib/quiz-score'
 import {
   quizContextLine,
   quizGaugeLabel,
   quizNoBottlenecksMessage,
   quizNoStrengthsMessage,
+  quizPhaseScoreLabel,
   quizRestartLabel,
+  quizShareLabel,
   quizTalkLabel,
 } from '@/lib/quiz'
 import { contactMessageQuestion } from '@/lib/contact'
+import { encodeAnswers } from '@/lib/quiz-share'
 
 const perfect = [0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3]
 const bleak = [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -56,11 +59,20 @@ describe('QuizResult', () => {
     ).toBeInTheDocument()
   })
 
-  it('charts all nine phases', () => {
+  it('charts all nine phases in the bars', () => {
     renderResult(bleak)
 
-    for (const phase of phases) {
-      expect(screen.getAllByText(phase.name).length).toBeGreaterThan(0)
+    // getAllByText(phase.name) would also match the <h3> a bottleneck card
+    // renders for the same phase, so it can't tell a missing bar row from a
+    // present card. Anchoring on the bar row's own role="img" + accessible
+    // name (quizPhaseScoreLabel, set by quiz-phase-bars.tsx) can only be
+    // satisfied by the bar itself.
+    for (const result of phaseResults(bleak)) {
+      expect(
+        screen.getByRole('img', {
+          name: quizPhaseScoreLabel(result.name, result.score),
+        })
+      ).toBeInTheDocument()
     }
   })
 
@@ -88,6 +100,17 @@ describe('QuizResult', () => {
       (screen.getByLabelText(contactMessageQuestion) as HTMLTextAreaElement)
         .value
     ).toContain('0/100')
+  })
+
+  it('wires the share button to these exact answers', async () => {
+    const user = userEvent.setup()
+    renderResult(bleak)
+
+    await user.click(screen.getByRole('button', { name: quizShareLabel }))
+
+    expect(await navigator.clipboard.readText()).toContain(
+      `r=${encodeAnswers(bleak)}`
+    )
   })
 
   it('hands the restart back to its caller', async () => {
