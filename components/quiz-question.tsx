@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { quizBackLabel, quizPositionLabel } from '@/lib/quiz'
+import { quizBackLabel } from '@/lib/quiz'
 
 /**
  * Options are buttons rather than a radiogroup. Choosing one advances the
@@ -51,12 +51,6 @@ export function QuizQuestion({
       >
         {question}
       </h1>
-
-      {/* The visible progress lives in the top bar and is decorative there.
-          This is the same information in the form a screen reader can use. */}
-      <p role="status" className="sr-only">
-        {quizPositionLabel(position, total)}
-      </p>
 
       <ul className="flex flex-col gap-3">
         {options.map((option, index) => (

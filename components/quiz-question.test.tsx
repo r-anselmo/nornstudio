@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QuizQuestion } from './quiz-question'
 import { phases } from '@/lib/quiz-questions'
-import { quizBackLabel, quizPositionLabel } from '@/lib/quiz'
+import { quizBackLabel } from '@/lib/quiz'
 
 const phase = phases[0]
 
@@ -21,8 +21,8 @@ function renderQuestion(
     onBack: vi.fn(),
     ...overrides,
   }
-  render(<QuizQuestion {...props} />)
-  return props
+  const { rerender } = render(<QuizQuestion {...props} />)
+  return { ...props, rerender }
 }
 
 describe('QuizQuestion', () => {
@@ -40,6 +40,14 @@ describe('QuizQuestion', () => {
     for (const option of phase.options) {
       expect(screen.getByRole('button', { name: option })).toBeInTheDocument()
     }
+  })
+
+  it('hides the option marker dot from the accessible name', () => {
+    renderQuestion()
+
+    const button = screen.getByRole('button', { name: phase.options[0] })
+    const marker = button.querySelector('span[aria-hidden]')
+    expect(marker).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('answers with the option index', async () => {
@@ -64,18 +72,41 @@ describe('QuizQuestion', () => {
     )
   })
 
-  it('announces the position without putting it on screen twice', () => {
-    renderQuestion()
-
-    const status = screen.getByRole('status')
-    expect(status).toHaveTextContent(quizPositionLabel(3, 11))
-    expect(status.className).toContain('sr-only')
-  })
-
   it('takes focus onto the question, since the pressed button is gone', () => {
     renderQuestion()
 
     expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1 }))
+  })
+
+  it('refocuses the new heading when a click removes the button that had focus', async () => {
+    const user = userEvent.setup()
+    const { rerender } = renderQuestion()
+
+    // Clicking an option gives it native focus, same as a real answer click.
+    await user.click(screen.getByRole('button', { name: phase.options[0] }))
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: phase.options[0] })
+    )
+
+    // The parent swaps in the next question: different options, so React
+    // unmounts the previously-focused button along with the rest of the list.
+    const nextPhase = phases[1]
+    rerender(
+      <QuizQuestion
+        tag={nextPhase.tag}
+        question={nextPhase.question}
+        options={nextPhase.options}
+        selected={null}
+        position={4}
+        total={11}
+        onAnswer={vi.fn()}
+        onBack={vi.fn()}
+      />
+    )
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('heading', { level: 1, name: nextPhase.question })
+    )
   })
 
   it('offers a way back', async () => {

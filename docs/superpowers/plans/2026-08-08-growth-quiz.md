@@ -2318,7 +2318,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QuizQuestion } from './quiz-question'
 import { phases } from '@/lib/quiz-questions'
-import { quizBackLabel, quizPositionLabel } from '@/lib/quiz'
+import { quizBackLabel } from '@/lib/quiz'
 
 const phase = phases[0]
 
@@ -2379,14 +2379,6 @@ describe('QuizQuestion', () => {
     )
   })
 
-  it('announces the position without putting it on screen twice', () => {
-    renderQuestion()
-
-    const status = screen.getByRole('status')
-    expect(status).toHaveTextContent(quizPositionLabel(3, 11))
-    expect(status.className).toContain('sr-only')
-  })
-
   it('takes focus onto the question, since the pressed button is gone', () => {
     renderQuestion()
 
@@ -2415,7 +2407,7 @@ Expected: FAIL — `Failed to resolve import "./quiz-question"`.
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { quizBackLabel, quizPositionLabel } from '@/lib/quiz'
+import { quizBackLabel } from '@/lib/quiz'
 
 /**
  * Options are buttons rather than a radiogroup. Choosing one advances the
@@ -2466,12 +2458,6 @@ export function QuizQuestion({
         {question}
       </h1>
 
-      {/* The visible progress lives in the top bar and is decorative there.
-          This is the same information in the form a screen reader can use. */}
-      <p role="status" className="sr-only">
-        {quizPositionLabel(position, total)}
-      </p>
-
       <ul className="flex flex-col gap-3">
         {options.map((option, index) => (
           <li key={option}>
@@ -2514,7 +2500,7 @@ export function QuizQuestion({
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run components/quiz-question.test.tsx`
-Expected: PASS, 7 tests.
+Expected: PASS, 6 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -2546,6 +2532,7 @@ import { bandFor, phaseResults, totalScore } from '@/lib/quiz-score'
 import { encodeAnswers } from '@/lib/quiz-share'
 import {
   quizIntroHeadline,
+  quizPositionLabel,
   quizRestartLabel,
   quizStartLabel,
 } from '@/lib/quiz'
@@ -2671,6 +2658,23 @@ describe('QuizExperience', () => {
     await user.click(screen.getByRole('button', { name: first[0] }))
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '9')
   })
+
+  it('keeps a permanent status region for the question position, empty until a question shows', async () => {
+    const user = userEvent.setup()
+    renderQuiz()
+
+    // Mounted from first paint, unlike the question screen's own heading: on
+    // the very first question there is no QuizQuestion instance yet to own
+    // this text, so a region created there would already contain "Pergunta 1
+    // de 11" at the moment it is inserted — not reliably announced.
+    const status = screen.getByRole('status')
+    expect(status.className).toContain('sr-only')
+    expect(status).toHaveTextContent('')
+
+    await user.click(screen.getByRole('button', { name: quizStartLabel }))
+
+    expect(status).toHaveTextContent(quizPositionLabel(1, QUESTION_COUNT))
+  })
 })
 ```
 
@@ -2690,7 +2694,7 @@ import { QuizQuestion } from '@/components/quiz-question'
 import { QuizResult } from '@/components/quiz-result'
 import { NornBadge } from '@/components/ui/norn-badge'
 import { brandSignature } from '@/lib/footer'
-import { quizChromeLabel, quizProgressLabel } from '@/lib/quiz'
+import { quizChromeLabel, quizPositionLabel, quizProgressLabel } from '@/lib/quiz'
 import { QUESTION_COUNT, questionAt } from '@/lib/quiz-questions'
 import { isComplete } from '@/lib/quiz-score'
 import { readSharedAnswers } from '@/lib/quiz-share'
@@ -2803,6 +2807,21 @@ export function QuizExperience() {
             </div>
           )}
         </div>
+
+        {/* Permanently mounted, rather than owned by QuizQuestion: on the
+            very first question there is no QuizQuestion instance yet to
+            insert this text, so a live region created there would already
+            contain "Pergunta 1 de 11" the moment it appears — a screen
+            reader does not reliably announce a live region that arrives with
+            content already inside it. Sitting here instead means only its
+            text content ever changes, so every announcement fires, including
+            the first. It is this bar's accessible twin: same information,
+            silent and empty outside a question. */}
+        <p role="status" className="sr-only">
+          {state.screen === 'question'
+            ? quizPositionLabel(state.index + 1, QUESTION_COUNT)
+            : ''}
+        </p>
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12 md:px-12 md:py-20">
@@ -2841,7 +2860,7 @@ export function QuizExperience() {
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run components/quiz-experience.test.tsx`
-Expected: PASS, 8 tests.
+Expected: PASS, 9 tests.
 
 If the progress assertion fails on the rounding, check the arithmetic: one
 answer out of eleven is `Math.round(9.09)` = `9`.
