@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import {
   SHARE_PARAM,
   buildShareUrl,
@@ -64,11 +64,35 @@ describe('readSharedAnswers', () => {
 })
 
 describe('buildShareUrl', () => {
+  afterEach(() => {
+    window.history.replaceState({}, '', '/')
+  })
+
   it('builds the link from the current location, basePath included', () => {
     window.history.replaceState({}, '', '/nornstudio/quiz/')
 
     expect(buildShareUrl(answers)).toBe(
       `${window.location.origin}/nornstudio/quiz/?${SHARE_PARAM}=${encodeAnswers(answers)}`
     )
+  })
+
+  it('drops a stale ?r= instead of appending a second one', () => {
+    // The realistic share flow: a visitor opens someone else's link, retakes
+    // the quiz, and shares their own result from that same tab. At that
+    // point location.search still carries the old ?r=, and it must not
+    // survive into the new link — neither doubled up nor left in place of
+    // the fresh one.
+    const stale = encodeAnswers([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    window.history.replaceState(
+      {},
+      '',
+      `/nornstudio/quiz/?${SHARE_PARAM}=${stale}`
+    )
+
+    const url = buildShareUrl(answers)
+    const fresh = encodeAnswers(answers)
+
+    expect(url.split(fresh)).toHaveLength(2)
+    expect(url).not.toContain(stale)
   })
 })

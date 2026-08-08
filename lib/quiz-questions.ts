@@ -1,9 +1,14 @@
 // Copy lives here rather than in JSX: `react/no-unescaped-entities` is
 // error-level in this repo and rejects apostrophes and quotes in JSX text.
 //
-// This is the diagnostic's source of truth. `lib/quiz-score.ts` reads the
-// option order — index 0 is always the weakest answer and index 3 the
-// strongest — so reordering options here silently rewrites every score.
+// This is the diagnostic's source of truth, and two other files depend on it
+// staying put. `lib/quiz-score.ts` reads the option order — index 0 is always
+// the weakest answer and index 3 the strongest — so reordering options here
+// silently rewrites every score. And `lib/quiz-share.ts` encodes an answer as
+// an option index per question, so adding, removing or reordering a question
+// or its options here means bumping `FORMAT_VERSION` in that file too —
+// otherwise a link shared under the old questions keeps decoding, onto
+// answers its author never gave.
 
 export type QuizPhase = {
   /** The label above the question, e.g. 'Fase 00 · Qualificação do sintoma'. */
