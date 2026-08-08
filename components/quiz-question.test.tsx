@@ -16,7 +16,6 @@ function renderQuestion(
     options: phase.options,
     selected: null as number | null,
     position: 3,
-    total: 11,
     onAnswer: vi.fn(),
     onBack: vi.fn(),
     ...overrides,
@@ -98,7 +97,6 @@ describe('QuizQuestion', () => {
         options={nextPhase.options}
         selected={null}
         position={4}
-        total={11}
         onAnswer={vi.fn()}
         onBack={vi.fn()}
       />

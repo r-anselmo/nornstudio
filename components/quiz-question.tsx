@@ -16,7 +16,6 @@ export function QuizQuestion({
   options,
   selected,
   position,
-  total,
   onAnswer,
   onBack,
 }: {
@@ -25,7 +24,6 @@ export function QuizQuestion({
   options: readonly string[]
   selected: number | null
   position: number
-  total: number
   onAnswer: (option: number) => void
   onBack: () => void
 }) {

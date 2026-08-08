@@ -2331,7 +2331,6 @@ function renderQuestion(
     options: phase.options,
     selected: null as number | null,
     position: 3,
-    total: 11,
     onAnswer: vi.fn(),
     onBack: vi.fn(),
     ...overrides,
@@ -2422,7 +2421,6 @@ export function QuizQuestion({
   options,
   selected,
   position,
-  total,
   onAnswer,
   onBack,
 }: {
@@ -2431,7 +2429,6 @@ export function QuizQuestion({
   options: readonly string[]
   selected: number | null
   position: number
-  total: number
   onAnswer: (option: number) => void
   onBack: () => void
 }) {
@@ -2836,7 +2833,6 @@ export function QuizExperience() {
             options={question.options}
             selected={state.answers[state.index]}
             position={state.index + 1}
-            total={QUESTION_COUNT}
             onAnswer={(option) => dispatch({ type: 'answer', option })}
             onBack={() => dispatch({ type: 'back' })}
           />
