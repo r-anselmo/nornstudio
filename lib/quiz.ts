@@ -84,6 +84,10 @@ export const quizShareLabel = 'Copiar link do resultado'
 export const quizShareCopied = 'Link copiado.'
 export const quizShareManual =
   'Não deu para copiar automaticamente. Selecione e copie o link:'
+/** Names the read-only fallback field itself — distinct from `quizShareLabel`,
+ * which names the button's action, so tabbing between the two doesn't repeat
+ * the same accessible name on an imperative control and a passive one. */
+export const quizShareLinkLabel = 'Link do resultado'
 export const quizRestartLabel = 'Refazer diagnóstico'
 
 /**
