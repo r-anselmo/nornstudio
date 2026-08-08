@@ -47,9 +47,12 @@ describe('HeroSection', () => {
     expect(
       screen.getByRole('button', { name: /Iniciar Projeto/i })
     ).toBeInTheDocument()
+    // `vitest.setup.ts` sets `__NEXT_TRAILING_SLASH` to mirror
+    // next.config.ts's `trailingSlash: true`, so `next/link` appends the
+    // slash here exactly as it would in a real build.
     expect(
-      screen.getByRole('link', { name: 'Ver serviços' })
-    ).toBeInTheDocument()
+      screen.getByRole('link', { name: 'O Tear' })
+    ).toHaveAttribute('href', '/tear/')
   })
 
   it('renders the logo mark', () => {

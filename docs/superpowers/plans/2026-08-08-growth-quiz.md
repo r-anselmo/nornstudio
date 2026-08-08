@@ -38,8 +38,16 @@ Checked against this repo, not assumed:
 - `react/no-unescaped-entities` is error-level, so no Portuguese copy with
   apostrophes may appear in JSX. Every string comes from `lib/`.
 - The existing `components/site-footer.test.tsx` iterates `footerLinks` and
-  asserts `getByRole('link', { name: label })` has the matching `href`. A
-  `next/link` to `/quiz/` renders `<a href="/quiz/">`, so that test keeps
+  asserts `getByRole('link', { name: label })` has the matching `href`. This
+  only holds once `vitest.setup.ts` sets `process.env.__NEXT_TRAILING_SLASH =
+  '1'`: `next/link` inlines that flag from `next.config.ts`'s `trailingSlash:
+  true` during a real build, and without it — the situation this plan
+  originally shipped in — `next/link` strips the trailing slash off *any*
+  href it renders, regardless of what string you pass it, so `/quiz/` came
+  out as `/quiz`. (Verified independently: with the flag unset, both
+  `href="/quiz/"` and `href="/quiz"` render `/quiz`; with it set to `'1'`,
+  both render `/quiz/`.) With the flag set to match the build config, a
+  `next/link` to `/quiz/` renders `<a href="/quiz/">`, and that test keeps
   passing unchanged.
 - `app/page.test.tsx` only validates anchors matching `a[href^="#"]`, so a
   route link in the footer does not trip it.
