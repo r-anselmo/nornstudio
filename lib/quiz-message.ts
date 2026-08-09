@@ -1,5 +1,11 @@
 import { chosenStageAndGoal } from '@/lib/quiz-questions'
-import { bandFor, highlights, phaseResults, totalScore } from '@/lib/quiz-score'
+import {
+  BOTTLENECK_MAX_SCORE,
+  bandFor,
+  highlights,
+  phaseResults,
+  totalScore,
+} from '@/lib/quiz-score'
 
 /**
  * What the contact dialog opens pre-filled with. A lead that arrives carrying
@@ -31,7 +37,7 @@ export function buildContactMessage(answers: readonly number[]): string {
     ? `Meus gargalos:\n${bottlenecks
         .map((result) => `- ${result.name} (${result.score} pts)`)
         .join('\n')}`
-    : 'Nenhum gargalo apareceu abaixo de 66 pontos.'
+    : `Nenhum gargalo apareceu abaixo de ${BOTTLENECK_MAX_SCORE} pontos.`
 
   return [
     `Fiz o diagnóstico de growth e tirei ${score}/100 (${band.name}).`,
