@@ -4,7 +4,14 @@ import userEvent from '@testing-library/user-event'
 import { QuizResult } from './quiz-result'
 import { ContactDialogProvider } from './contact-dialog-provider'
 import { contextQuestion, goalQuestion } from '@/lib/quiz-questions'
-import { bandFor, highlights, phaseResults, totalScore } from '@/lib/quiz-score'
+import {
+  BOTTLENECK_MAX_SCORE,
+  STRENGTH_MIN_SCORE,
+  bandFor,
+  highlights,
+  phaseResults,
+  totalScore,
+} from '@/lib/quiz-score'
 import {
   quizContextLine,
   quizGaugeLabel,
@@ -80,14 +87,18 @@ describe('QuizResult', () => {
     renderResult(perfect)
 
     expect(highlights(phaseResults(perfect)).bottlenecks).toEqual([])
-    expect(screen.getByText(quizNoBottlenecksMessage)).toBeInTheDocument()
+    expect(
+      screen.getByText(quizNoBottlenecksMessage(BOTTLENECK_MAX_SCORE))
+    ).toBeInTheDocument()
   })
 
   it('says plainly when there is no strength to show', () => {
     renderResult(bleak)
 
     expect(highlights(phaseResults(bleak)).strengths).toEqual([])
-    expect(screen.getByText(quizNoStrengthsMessage)).toBeInTheDocument()
+    expect(
+      screen.getByText(quizNoStrengthsMessage(STRENGTH_MIN_SCORE))
+    ).toBeInTheDocument()
   })
 
   it('opens the contact dialog carrying the result', async () => {

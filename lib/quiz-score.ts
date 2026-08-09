@@ -4,13 +4,16 @@ import { FIRST_PHASE_INDEX, QUESTION_COUNT, phases } from '@/lib/quiz-questions'
 import type { QuizPhase } from '@/lib/quiz-questions'
 
 /** Option index → score. Four options per phase, weakest to strongest. */
-export const PHASE_SCORES = [0, 33, 66, 100]
+const PHASE_SCORES = [0, 33, 66, 100]
 
 /** At or above this, a phase is something to protect. */
 export const STRENGTH_MIN_SCORE = 66
 /** At or below this, a phase is something to work on. */
 export const BOTTLENECK_MAX_SCORE = 66
 
+// Exported (unlike PHASE_SCORES above) because quiz-score.test.ts asserts
+// against them directly, so the cap in the test and the cap `highlights`
+// enforces can never drift apart.
 export const MAX_STRENGTHS = 2
 export const MAX_BOTTLENECKS = 3
 

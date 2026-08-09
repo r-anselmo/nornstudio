@@ -218,3 +218,25 @@ export function questionAt(questionIndex: number): QuizContextQuestion | QuizPha
   if (questionIndex === 1) return goalQuestion
   return phases[questionIndex - FIRST_PHASE_INDEX]
 }
+
+/**
+ * The stage and goal a visitor chose, resolved from the two context answers.
+ * `quiz-result.tsx`'s context line and `quiz-message.ts`'s contact prefill
+ * both need this pair — one helper here means reordering or adding a context
+ * question can only break both the same way, not silently swap the stage and
+ * goal in one of them while leaving the other correct.
+ *
+ * Indexed with no fallback: `answers` is only ever complete and in-range when
+ * either caller runs — the reducer in `quiz-experience.tsx` builds it one
+ * in-range click at a time, and a shared link is range-validated by
+ * `decodeAnswers` (`lib/quiz-share.ts`) before it reaches either.
+ */
+export function chosenStageAndGoal(answers: readonly number[]): {
+  stage: string
+  goal: string
+} {
+  return {
+    stage: contextQuestion.options[answers[0]],
+    goal: goalQuestion.options[answers[1]],
+  }
+}

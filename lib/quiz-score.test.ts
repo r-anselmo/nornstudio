@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
+  MAX_BOTTLENECKS,
+  MAX_STRENGTHS,
   MIN_SCORE_OPACITY,
   bandFor,
   highlights,
@@ -86,7 +88,7 @@ describe('highlights', () => {
 
     // The mock still printed three "gargalos" cards here, each reading 100 pts.
     expect(bottlenecks).toEqual([])
-    expect(strengths).toHaveLength(2)
+    expect(strengths).toHaveLength(MAX_STRENGTHS)
     expect(strengths.every((result) => result.score === 100)).toBe(true)
   })
 
@@ -94,7 +96,7 @@ describe('highlights', () => {
     const { strengths, bottlenecks } = highlights(phaseResults(answersWith(0)))
 
     expect(strengths).toEqual([])
-    expect(bottlenecks).toHaveLength(3)
+    expect(bottlenecks).toHaveLength(MAX_BOTTLENECKS)
   })
 
   it('never lists the same phase as both a strength and a bottleneck', () => {
@@ -107,8 +109,8 @@ describe('highlights', () => {
       strengthNames.includes(result.name)
     )
     expect(overlap).toEqual([])
-    expect(strengths).toHaveLength(2)
-    expect(bottlenecks).toHaveLength(3)
+    expect(strengths).toHaveLength(MAX_STRENGTHS)
+    expect(bottlenecks).toHaveLength(MAX_BOTTLENECKS)
   })
 
   it('breaks ties by phase order, so a shared link is deterministic', () => {

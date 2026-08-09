@@ -24,8 +24,15 @@ import {
 } from '@/lib/quiz'
 import { buildContactMessage } from '@/lib/quiz-message'
 import { STAGGER_MS } from '@/lib/motion'
-import { contextQuestion, goalQuestion } from '@/lib/quiz-questions'
-import { bandFor, highlights, phaseResults, totalScore } from '@/lib/quiz-score'
+import { chosenStageAndGoal } from '@/lib/quiz-questions'
+import {
+  BOTTLENECK_MAX_SCORE,
+  STRENGTH_MIN_SCORE,
+  bandFor,
+  highlights,
+  phaseResults,
+  totalScore,
+} from '@/lib/quiz-score'
 
 const sectionHeadingClass =
   'font-heading text-sm font-black uppercase tracking-[0.1em] text-platinum-gray'
@@ -51,6 +58,7 @@ export function QuizResult({
   const score = totalScore(results)
   const band = bandFor(score)
   const { strengths, bottlenecks } = highlights(results)
+  const { stage, goal } = chosenStageAndGoal(answers)
 
   const message = buildContactMessage(answers)
 
@@ -79,15 +87,7 @@ export function QuizResult({
           </div>
         </div>
         <p className="mt-8 font-body text-xs text-platinum-gray">
-          {/* Indexed with no fallback: `answers` is only ever complete and
-              in-range here — the reducer builds it one in-range click at a
-              time, and a shared link is range-validated by `decodeAnswers`
-              before it reaches this screen. Same precondition
-              `buildContactMessage` relies on in lib/quiz-message.ts. */}
-          {quizContextLine(
-            contextQuestion.options[answers[0]],
-            goalQuestion.options[answers[1]]
-          )}
+          {quizContextLine(stage, goal)}
         </p>
       </div>
 
@@ -109,7 +109,7 @@ export function QuizResult({
             </SpotlightGroup>
           ) : (
             <p className="font-body text-sm text-platinum-gray">
-              {quizNoStrengthsMessage}
+              {quizNoStrengthsMessage(STRENGTH_MIN_SCORE)}
             </p>
           )}
         </section>
@@ -130,7 +130,7 @@ export function QuizResult({
             </SpotlightGroup>
           ) : (
             <p className="font-body text-sm text-platinum-gray">
-              {quizNoBottlenecksMessage}
+              {quizNoBottlenecksMessage(BOTTLENECK_MAX_SCORE)}
             </p>
           )}
         </section>

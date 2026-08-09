@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   FIRST_PHASE_INDEX,
   QUESTION_COUNT,
+  chosenStageAndGoal,
   contextQuestion,
   goalQuestion,
   optionCountAt,
@@ -63,5 +64,15 @@ describe('quiz questions', () => {
     // Names are React keys and the identity used to exclude a strength from
     // the bottlenecks.
     expect(new Set(phases.map((phase) => phase.name)).size).toBe(phases.length)
+  })
+
+  it('resolves the stage and goal from the two context answers', () => {
+    // The result screen's context line and the contact prefill both call
+    // this, rather than each indexing `contextQuestion`/`goalQuestion`
+    // themselves — one helper means the two cannot drift apart.
+    expect(chosenStageAndGoal([2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0])).toEqual({
+      stage: contextQuestion.options[2],
+      goal: goalQuestion.options[1],
+    })
   })
 })

@@ -1,4 +1,4 @@
-import { contextQuestion, goalQuestion } from '@/lib/quiz-questions'
+import { chosenStageAndGoal } from '@/lib/quiz-questions'
 import { bandFor, highlights, phaseResults, totalScore } from '@/lib/quiz-score'
 
 /**
@@ -25,8 +25,7 @@ export function buildContactMessage(answers: readonly number[]): string {
   const band = bandFor(score)
   const { bottlenecks } = highlights(results)
 
-  const stage = contextQuestion.options[answers[0]]
-  const goal = goalQuestion.options[answers[1]]
+  const { stage, goal } = chosenStageAndGoal(answers)
 
   const gaps = bottlenecks.length
     ? `Meus gargalos:\n${bottlenecks

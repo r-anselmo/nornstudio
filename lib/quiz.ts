@@ -68,10 +68,25 @@ export function quizPointsLabel(score: number): string {
 export const quizProfileHeading = 'Seu perfil por fase'
 export const quizStrengthsHeading = 'Pontos fortes'
 export const quizBottlenecksHeading = 'Gargalos'
-export const quizNoStrengthsMessage =
-  'Nenhuma fase passou de 66 pontos ainda — o ponto de partida está nos gargalos abaixo.'
-export const quizNoBottlenecksMessage =
-  'Nenhuma fase ficou abaixo de 66 pontos. O trabalho agora é proteger o que já funciona.'
+
+/**
+ * Take the threshold as a parameter rather than quoting it: the number is
+ * `STRENGTH_MIN_SCORE` in `lib/quiz-score.ts`, and this module cannot import
+ * that constant directly without a circular import (`quiz-score.ts` already
+ * imports `quizBands` from here). Letting the caller — which already has the
+ * constant — pass it in keeps the copy from quietly drifting out of sync with
+ * the score it describes, the same failure `quizBands`' own comment below
+ * warns about.
+ */
+export function quizNoStrengthsMessage(minScore: number): string {
+  return `Nenhuma fase passou de ${minScore} pontos ainda — o ponto de partida está nos gargalos abaixo.`
+}
+
+/** Same reasoning as `quizNoStrengthsMessage` above, for `BOTTLENECK_MAX_SCORE`. */
+export function quizNoBottlenecksMessage(maxScore: number): string {
+  return `Nenhuma fase ficou abaixo de ${maxScore} pontos. O trabalho agora é proteger o que já funciona.`
+}
+
 export const quizWhyLabel = 'Por que isso importa:'
 export const quizActionLabel = 'Próximo passo sugerido'
 
