@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { ContactTrigger } from '@/components/contact-trigger'
 import { QuizGauge } from '@/components/quiz-gauge'
+import { QuizHorizonChart } from '@/components/quiz-horizon-chart'
 import { QuizInsightCard } from '@/components/quiz-insight-card'
 import { QuizPhaseBars } from '@/components/quiz-phase-bars'
 import { QuizShareButton } from '@/components/quiz-share-button'
@@ -13,9 +14,11 @@ import {
   quizBottlenecksHeading,
   quizContextLine,
   quizCtaBody,
+  quizCtaBodyPerfect,
   quizCtaTitle,
-  quizNoBottlenecksMessage,
   quizNoStrengthsMessage,
+  quizPerfectHeadline,
+  quizPerfectSupportText,
   quizProfileHeading,
   quizRestartLabel,
   quizResultEyebrow,
@@ -26,10 +29,10 @@ import { buildContactMessage } from '@/lib/quiz-message'
 import { STAGGER_MS } from '@/lib/motion'
 import { chosenStageAndGoal } from '@/lib/quiz-questions'
 import {
-  BOTTLENECK_MAX_SCORE,
   STRENGTH_MIN_SCORE,
   bandFor,
   highlights,
+  isPerfectScore,
   phaseResults,
   totalScore,
 } from '@/lib/quiz-score'
@@ -58,6 +61,7 @@ export function QuizResult({
   const score = totalScore(results)
   const band = bandFor(score)
   const { strengths, bottlenecks } = highlights(results)
+  const isPerfect = isPerfectScore(results)
   const { stage, goal } = chosenStageAndGoal(answers)
 
   const message = buildContactMessage(answers)
@@ -117,32 +121,47 @@ export function QuizResult({
 
       <Reveal delay={STAGGER_MS * 2}>
         <section className="flex flex-col gap-5">
-          <h2 className={sectionHeadingClass}>{quizBottlenecksHeading}</h2>
-          {bottlenecks.length > 0 ? (
-            <SpotlightGroup className="grid gap-4">
-              {bottlenecks.map((result) => (
-                <QuizInsightCard
-                  key={result.name}
-                  result={result}
-                  tone="bottleneck"
-                />
-              ))}
-            </SpotlightGroup>
+          {isPerfect ? (
+            <>
+              <h2 className="font-heading text-xl font-black leading-tight text-alabaster md:text-2xl">
+                {quizPerfectHeadline}
+              </h2>
+              <p className="font-body text-sm text-platinum-gray">
+                {quizPerfectSupportText}
+              </p>
+            </>
           ) : (
-            <p className="font-body text-sm text-platinum-gray">
-              {quizNoBottlenecksMessage(BOTTLENECK_MAX_SCORE)}
-            </p>
+            <>
+              <h2 className={sectionHeadingClass}>{quizBottlenecksHeading}</h2>
+              <SpotlightGroup className="grid gap-4">
+                {bottlenecks.map((result) => (
+                  <QuizInsightCard
+                    key={result.name}
+                    result={result}
+                    tone="bottleneck"
+                  />
+                ))}
+              </SpotlightGroup>
+            </>
           )}
         </section>
       </Reveal>
 
       <Reveal delay={STAGGER_MS * 3}>
+        <QuizHorizonChart
+          score={score}
+          bottleneck={bottlenecks[0] ?? null}
+          isPerfect={isPerfect}
+        />
+      </Reveal>
+
+      <Reveal delay={STAGGER_MS * 4}>
         <div className="rounded-2xl border border-lime/40 bg-alabaster/5 p-6 md:p-8">
           <p className="font-heading text-xl font-black leading-tight text-alabaster md:text-2xl">
             {quizCtaTitle}
           </p>
           <p className="mt-4 max-w-xl font-body text-sm text-platinum-gray">
-            {quizCtaBody}
+            {isPerfect ? quizCtaBodyPerfect : quizCtaBody}
           </p>
           <div className="mt-7 flex flex-wrap items-start gap-3">
             <ContactTrigger

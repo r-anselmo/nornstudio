@@ -5,7 +5,6 @@ import { QuizResult } from './quiz-result'
 import { ContactDialogProvider } from './contact-dialog-provider'
 import { contextQuestion, goalQuestion } from '@/lib/quiz-questions'
 import {
-  BOTTLENECK_MAX_SCORE,
   STRENGTH_MIN_SCORE,
   bandFor,
   highlights,
@@ -13,10 +12,15 @@ import {
   totalScore,
 } from '@/lib/quiz-score'
 import {
+  quizBottlenecksHeading,
   quizContextLine,
+  quizCtaBody,
+  quizCtaBodyPerfect,
   quizGaugeLabel,
-  quizNoBottlenecksMessage,
+  quizHorizonChartLabel,
   quizNoStrengthsMessage,
+  quizPerfectHeadline,
+  quizPerfectSupportText,
   quizPhaseScoreLabel,
   quizRestartLabel,
   quizShareLabel,
@@ -83,12 +87,51 @@ describe('QuizResult', () => {
     }
   })
 
-  it('says plainly when there is no bottleneck to show', () => {
+  it('replaces Gargalos with the perfect-score message when every phase maxes out', () => {
     renderResult(perfect)
 
     expect(highlights(phaseResults(perfect)).bottlenecks).toEqual([])
+    expect(screen.getByText(quizPerfectHeadline)).toBeInTheDocument()
+    // Shown twice on purpose: once under the success headline in the
+    // Gargalos slot, once as the horizon chart's own support text.
+    expect(screen.getAllByText(quizPerfectSupportText)).toHaveLength(2)
     expect(
-      screen.getByText(quizNoBottlenecksMessage(BOTTLENECK_MAX_SCORE))
+      screen.queryByRole('heading', { name: quizBottlenecksHeading })
+    ).not.toBeInTheDocument()
+  })
+
+  it('still shows Gargalos normally when the score is not perfect', () => {
+    renderResult(bleak)
+
+    expect(
+      screen.getByRole('heading', { name: quizBottlenecksHeading })
+    ).toBeInTheDocument()
+  })
+
+  it('swaps the CTA body copy for a perfect score', () => {
+    renderResult(perfect)
+
+    expect(screen.getByText(quizCtaBodyPerfect)).toBeInTheDocument()
+    expect(screen.queryByText(quizCtaBody)).not.toBeInTheDocument()
+  })
+
+  it('keeps the default CTA body otherwise', () => {
+    renderResult(bleak)
+
+    expect(screen.getByText(quizCtaBody)).toBeInTheDocument()
+  })
+
+  it('always shows the horizon chart, regardless of score', () => {
+    renderResult(bleak)
+    expect(
+      screen.getByRole('img', {
+        name: quizHorizonChartLabel(totalScore(phaseResults(bleak))),
+      })
+    ).toBeInTheDocument()
+
+    renderResult(perfect)
+    expect(
+      screen.getByRole('img', { name: quizHorizonChartLabel(100) })
     ).toBeInTheDocument()
   })
 

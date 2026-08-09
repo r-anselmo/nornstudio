@@ -86,6 +86,20 @@ export function highlights(results: readonly PhaseResult[]): {
 }
 
 /**
+ * True only when every one of the 9 phases individually scored 100 — not
+ * just a 100 average, which this quiz's discrete {0,33,66,100} scale cannot
+ * produce any other way. Equivalent to
+ * `highlights(results).bottlenecks.length === 0` given MAX_STRENGTHS = 2 (a
+ * phase below 100 can only escape being a bottleneck by being claimed as a
+ * strength, and a 100-scoring phase always wins a strength slot over one
+ * that isn't, so zero bottlenecks is only reachable if all 9 are 100) — but
+ * spelled out directly so a call site doesn't have to re-derive that proof.
+ */
+export function isPerfectScore(results: readonly PhaseResult[]): boolean {
+  return results.every((result) => result.score === 100)
+}
+
+/**
  * How solid a bar or the gauge ring paints. Norn has no red, so a weak score
  * cannot change hue the way the source mock did — it stays lime and loses
  * opacity. Every bar prints its number too, because opacity alone is not a

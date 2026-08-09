@@ -6,6 +6,7 @@ import {
   bandFor,
   highlights,
   isComplete,
+  isPerfectScore,
   phaseResults,
   scoreOpacity,
   totalScore,
@@ -143,6 +144,24 @@ describe('highlights', () => {
       phases[7].name,
       phases[1].name,
     ])
+  })
+})
+
+describe('isPerfectScore', () => {
+  it('is true when every phase takes the strongest option', () => {
+    expect(isPerfectScore(phaseResults(answersWith(3)))).toBe(true)
+  })
+
+  it('is false when even one phase is short of the top', () => {
+    const results = phaseResults([0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 2])
+    expect(isPerfectScore(results)).toBe(false)
+  })
+
+  it('agrees with highlights() finding zero bottlenecks', () => {
+    const results = phaseResults(answersWith(3))
+    expect(isPerfectScore(results)).toBe(
+      highlights(results).bottlenecks.length === 0
+    )
   })
 })
 
