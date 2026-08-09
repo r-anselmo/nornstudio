@@ -235,3 +235,79 @@ describe('ContactDialog', () => {
     expect(await screen.findByLabelText(contactNameQuestion)).toHaveValue('')
   })
 })
+
+describe('ContactDialog prefill', () => {
+  function renderWithPrefill(message?: string) {
+    return render(
+      <ContactDialogProvider>
+        <ContactTrigger message={message}>Falar com a Norn</ContactTrigger>
+      </ContactDialogProvider>
+    )
+  }
+
+  it('starts the message field from the prefill the trigger carries', async () => {
+    const user = userEvent.setup()
+    renderWithPrefill('Tirei 55/100 no diagnóstico.')
+
+    await user.click(screen.getByRole('button', { name: 'Falar com a Norn' }))
+
+    expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue(
+      'Tirei 55/100 no diagnóstico.'
+    )
+  })
+
+  it('leaves the prefilled message editable', async () => {
+    const user = userEvent.setup()
+    renderWithPrefill('Tirei 55/100.')
+
+    await user.click(screen.getByRole('button', { name: 'Falar com a Norn' }))
+    await user.type(screen.getByLabelText(contactMessageQuestion), ' Quero ajuda.')
+
+    expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue(
+      'Tirei 55/100. Quero ajuda.'
+    )
+  })
+
+  it('still opens empty for a trigger that carries nothing', async () => {
+    const user = userEvent.setup()
+    renderWithPrefill()
+
+    await user.click(screen.getByRole('button', { name: 'Falar com a Norn' }))
+
+    // The hero and the CTA section pass no message; their behaviour must not
+    // change.
+    expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue('')
+  })
+
+  it('does not leak one trigger’s prefill into the next trigger opened', async () => {
+    // ContactTrigger calls open({ message }) unconditionally, even when
+    // message is undefined, so the provider's stored prefill is overwritten
+    // on every open. That overwrite is load-bearing: without it, a visitor
+    // who opens the quiz's prefilled dialog, closes it, then opens the plain
+    // "Iniciar Projeto" trigger would find someone else's diagnosis still
+    // sitting in the message field.
+    const user = userEvent.setup()
+    render(
+      <ContactDialogProvider>
+        <ContactTrigger message="Tirei 55/100 no diagnóstico.">
+          Falar com a Norn
+        </ContactTrigger>
+        <ContactTrigger>Iniciar Projeto</ContactTrigger>
+      </ContactDialogProvider>
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Falar com a Norn' }))
+    expect(screen.getByLabelText(contactMessageQuestion)).toHaveValue(
+      'Tirei 55/100 no diagnóstico.'
+    )
+
+    await user.keyboard('{Escape}')
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Iniciar Projeto' }))
+
+    expect(await screen.findByLabelText(contactMessageQuestion)).toHaveValue('')
+  })
+})

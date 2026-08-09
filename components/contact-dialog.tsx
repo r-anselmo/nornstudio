@@ -22,6 +22,7 @@ import { isValid, validateContact } from '@/lib/validate-contact'
 import type { ContactErrors, ContactValues } from '@/lib/validate-contact'
 import { NornBadge } from '@/components/ui/norn-badge'
 import { NornMark } from '@/components/ui/norn-mark'
+import { useContactDialog } from '@/components/contact-dialog-provider'
 import { STAGGER_MS } from '@/lib/motion'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
@@ -89,7 +90,15 @@ function ContactDialogBody() {
   const emailId = useId()
   const messageId = useId()
 
-  const [values, setValues] = useState<ContactValues>(EMPTY)
+  const { prefill } = useContactDialog()
+
+  // Initial state only: re-reading the prefill on every render would fight the
+  // visitor for the field. A later opening mounts this component again, which
+  // is when a new prefill takes effect.
+  const [values, setValues] = useState<ContactValues>({
+    ...EMPTY,
+    message: prefill.message ?? '',
+  })
   const [botcheck, setBotcheck] = useState('')
   const [errors, setErrors] = useState<ContactErrors>({})
   const [status, setStatus] = useState<Status>('idle')

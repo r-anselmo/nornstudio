@@ -1,7 +1,13 @@
+import Link from 'next/link'
 import { brandSignature, footerLinks, footerTagline } from '@/lib/footer'
 import { NornBadge } from '@/components/ui/norn-badge'
 import { Reveal } from '@/components/ui/reveal'
 import { STAGGER_MS } from '@/lib/motion'
+
+// One literal shared by both link kinds — Tailwind's scanner only sees
+// literals, and two copies would drift.
+const footerLinkClass =
+  'focus-ring rounded-sm font-body text-xs font-medium tracking-[0.02em] text-platinum-gray transition-colors duration-instant hover:text-lime motion-reduce:transition-none'
 
 export function SiteFooter() {
   // Evaluated at prerender, so a rebuild refreshes it rather than leaving a
@@ -28,12 +34,18 @@ export function SiteFooter() {
             <ul className="flex flex-col gap-3 md:items-end">
               {footerLinks.map(({ href, label }) => (
                 <li key={href}>
-                  <a
-                    href={href}
-                    className="focus-ring rounded-sm font-body text-xs font-medium tracking-[0.02em] text-platinum-gray transition-colors duration-instant hover:text-lime motion-reduce:transition-none"
-                  >
-                    {label}
-                  </a>
+                  {/* Deriving the kind from the href rather than adding a field
+                      that could disagree with it. An in-page anchor must stay a
+                      plain <a>; a route needs Link to avoid a full reload. */}
+                  {href.startsWith('#') ? (
+                    <a href={href} className={footerLinkClass}>
+                      {label}
+                    </a>
+                  ) : (
+                    <Link href={href} className={footerLinkClass}>
+                      {label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

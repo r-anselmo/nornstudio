@@ -12,8 +12,18 @@ import type { ReactNode } from 'react'
 import { ContactDialog } from '@/components/contact-dialog'
 import { MOTION_HYDRATED_FLAG } from '@/lib/motion'
 
+export type ContactPrefill = {
+  message?: string
+}
+
 type ContactDialogValue = {
-  open: () => void
+  open: (prefill?: ContactPrefill) => void
+  /**
+   * What the form should start from. Read once, when the form mounts — which
+   * is every time the dialog opens, because Base UI unmounts the portal
+   * subtree on close.
+   */
+  prefill: ContactPrefill
 }
 
 const ContactDialogContext = createContext<ContactDialogValue | null>(null)
@@ -41,8 +51,14 @@ export function useContactDialog(): ContactDialogValue {
  */
 export function ContactDialogProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
-  const open = useCallback(() => setIsOpen(true), [])
-  const value = useMemo(() => ({ open }), [open])
+  const [prefill, setPrefill] = useState<ContactPrefill>({})
+
+  const open = useCallback((next: ContactPrefill = {}) => {
+    setPrefill(next)
+    setIsOpen(true)
+  }, [])
+
+  const value = useMemo(() => ({ open, prefill }), [open, prefill])
 
   useEffect(() => {
     // Tells the gate script in app/layout.tsx that the bundle is alive, so it
