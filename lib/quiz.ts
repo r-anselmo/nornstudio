@@ -100,47 +100,11 @@ export const quizShareManual =
 export const quizShareLinkLabel = 'Link do resultado'
 export const quizRestartLabel = 'Refazer diagnóstico'
 
-export const quizHorizonHeading = 'Seu próximo horizonte'
-
-export const quizHorizonLegendAlone = 'Ritmo sozinho'
-export const quizHorizonLegendWithNorn = 'Ritmo com a Norn'
-export const quizHorizonYouAreHere = 'Você está aqui'
-
-export const quizHorizonAxisLabels = ['Hoje', '+3m', '+6m', '+9m', '+12m']
-
-/** Always shown, fixed, never score-dependent — the line that keeps the
- *  chart from reading as a real statistical projection. */
-export const quizHorizonDisclaimer =
-  'Ilustração do próximo horizonte — não uma projeção calculada. Sozinho, o motor que já funciona tende a esbarrar no teto que ele mesmo criou. Com um olhar de fora questionando as próprias decisões, esse teto é o próximo ponto a romper.'
-
-/**
- * Names the single biggest bottleneck under the chart. Takes the name as a
- * parameter, same reasoning as `quizNoStrengthsMessage` above: this module
- * cannot import from `lib/quiz-score.ts` (circular import), so the caller —
- * which already ran `highlights()` — passes in what it already has.
- */
-export function quizHorizonBottleneckText(bottleneckName: string): string {
-  return `${bottleneckName} é o gargalo que mais está segurando esse teto no lugar hoje — resolver isso é o que abre o próximo patamar.`
-}
-
-/**
- * The chart wrapper's `role="img"` `aria-label` — describes the shape only;
- * the "why" is carried by the legend, disclaimer and support text beside it,
- * same split `quizGaugeLabel` uses for the ring.
- */
-export function quizHorizonChartLabel(score: number): string {
-  return `Gráfico ilustrativo do próximo horizonte a partir da nota ${score} de 100: o ritmo sozinho se aproxima de um teto sem ultrapassá-lo, o ritmo com a Norn ultrapassa esse teto.`
-}
-
 export const quizPerfectHeadline =
   'Você já resolveu o que a maioria das empresas nunca chega a resolver. A pergunta deixou de ser "como crescer" e virou "até onde esse motor aguenta ir" — novo mercado, novo canal, novo teto.'
 
-/**
- * Reused as-is in two places: the horizon chart's support-text slot when
- * `isPerfectScore` is true, and directly below `quizPerfectHeadline` in the
- * block that replaces Gargalos. Import it in both places — never duplicate
- * the string.
- */
+/** Shown directly below `quizPerfectHeadline` in the block that replaces
+ *  Gargalos when `isPerfectScore` is true. */
 export const quizPerfectSupportText =
   'Você zerou o diagnóstico em todas as fases — sintoma qualificado, motor mapeado, priorização, MVP, arquitetura, caminho até o valor, teste instrumentado e loop girando. Isso não é comum, e o risco que vem junto é diferente do risco de quem está começando: não é o que está quebrado, é o que ninguém está mais questionando.'
 

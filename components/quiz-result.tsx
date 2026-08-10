@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react'
 import { ContactTrigger } from '@/components/contact-trigger'
 import { QuizGauge } from '@/components/quiz-gauge'
-import { QuizHorizonChart } from '@/components/quiz-horizon-chart'
 import { QuizInsightCard } from '@/components/quiz-insight-card'
 import { QuizPhaseBars } from '@/components/quiz-phase-bars'
 import { QuizShareButton } from '@/components/quiz-share-button'
@@ -145,14 +144,6 @@ export function QuizResult({
             </>
           )}
         </section>
-      </Reveal>
-
-      <Reveal delay={STAGGER_MS * 3}>
-        <QuizHorizonChart
-          score={score}
-          bottleneck={bottlenecks[0] ?? null}
-          isPerfect={isPerfect}
-        />
       </Reveal>
 
       <Reveal delay={STAGGER_MS * 4}>
