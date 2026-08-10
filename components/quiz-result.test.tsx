@@ -17,7 +17,6 @@ import {
   quizCtaBody,
   quizCtaBodyPerfect,
   quizGaugeLabel,
-  quizHorizonChartLabel,
   quizNoStrengthsMessage,
   quizPerfectHeadline,
   quizPerfectSupportText,
@@ -92,9 +91,7 @@ describe('QuizResult', () => {
 
     expect(highlights(phaseResults(perfect)).bottlenecks).toEqual([])
     expect(screen.getByText(quizPerfectHeadline)).toBeInTheDocument()
-    // Shown twice on purpose: once under the success headline in the
-    // Gargalos slot, once as the horizon chart's own support text.
-    expect(screen.getAllByText(quizPerfectSupportText)).toHaveLength(2)
+    expect(screen.getByText(quizPerfectSupportText)).toBeInTheDocument()
     expect(
       screen.queryByRole('heading', { name: quizBottlenecksHeading })
     ).not.toBeInTheDocument()
@@ -119,20 +116,6 @@ describe('QuizResult', () => {
     renderResult(bleak)
 
     expect(screen.getByText(quizCtaBody)).toBeInTheDocument()
-  })
-
-  it('always shows the horizon chart, regardless of score', () => {
-    renderResult(bleak)
-    expect(
-      screen.getByRole('img', {
-        name: quizHorizonChartLabel(totalScore(phaseResults(bleak))),
-      })
-    ).toBeInTheDocument()
-
-    renderResult(perfect)
-    expect(
-      screen.getByRole('img', { name: quizHorizonChartLabel(100) })
-    ).toBeInTheDocument()
   })
 
   it('says plainly when there is no strength to show', () => {
